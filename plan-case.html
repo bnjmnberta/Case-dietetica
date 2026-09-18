@@ -1,0 +1,727 @@
+<title>Plan CASE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --lime:#8FCB3C;
+    --lime-deep:#6EA82C;
+    --deep:#0F3D33;
+    --deep-2:#0A2B24;
+    --gold:#C8933A;
+    --ink:#16211C;
+    --ink-soft:#4B564E;
+    --paper:#F7F8F2;
+    --surface:#FFFFFF;
+    --surface-2:#EFF2E7;
+    --line:#DDE2D5;
+    --shadow: 0 1px 2px rgba(15,61,51,0.06), 0 8px 24px rgba(15,61,51,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --lime:#A9E361;
+      --lime-deep:#8FCB3C;
+      --deep:#BFE7C9;
+      --deep-2:#DDF2E0;
+      --gold:#E0AE5C;
+      --ink:#EAF0E7;
+      --ink-soft:#AEBBAF;
+      --paper:#0B1512;
+      --surface:#101D18;
+      --surface-2:#152420;
+      --line:#243B31;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --lime:#A9E361;
+    --lime-deep:#8FCB3C;
+    --deep:#BFE7C9;
+    --deep-2:#DDF2E0;
+    --gold:#E0AE5C;
+    --ink:#EAF0E7;
+    --ink-soft:#AEBBAF;
+    --paper:#0B1512;
+    --surface:#101D18;
+    --surface-2:#152420;
+    --line:#243B31;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Public Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    padding:0 20px;
+  }
+  h1,h2,h3{
+    font-family:"Fraunces", Georgia, serif;
+    text-wrap:balance;
+    color:var(--deep);
+    margin:0;
+  }
+  a{color:var(--deep-2);}
+  .mono{font-family:"JetBrains Mono", ui-monospace, monospace;}
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    padding:48px 0 32px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+  }
+  .brand-mark{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px 22px;
+    border-radius:999px;
+    background:linear-gradient(120deg, var(--lime) 0%, var(--deep) 100%);
+    color:#fff;
+    font-family:"Fraunces", serif;
+    font-weight:600;
+    font-size:1.4rem;
+    letter-spacing:-0.01em;
+    box-shadow:var(--shadow);
+    margin-bottom:14px;
+  }
+  .masthead h1{font-size:clamp(1.7rem,3.2vw,2.5rem); font-weight:600;}
+  .masthead .kicker{
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .masthead .meta{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    text-align:right;
+    line-height:1.5;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:44px;
+    padding:36px 0 80px;
+    align-items:start;
+  }
+  nav.toc{
+    position:sticky;
+    top:24px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    font-size:0.86rem;
+  }
+  nav.toc a{
+    text-decoration:none;
+    color:var(--ink-soft);
+    padding:7px 10px;
+    border-radius:8px;
+    border-left:2px solid transparent;
+  }
+  nav.toc a:hover{color:var(--deep); background:var(--surface-2);}
+  nav.toc .num{font-family:"JetBrains Mono", monospace; font-size:0.72rem; margin-right:6px; color:var(--lime-deep);}
+
+  main{min-width:0;}
+  section{
+    padding:38px 0;
+    border-bottom:1px solid var(--line);
+    scroll-margin-top:20px;
+  }
+  section:last-child{border-bottom:none;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .section-num{
+    font-family:"JetBrains Mono", monospace;
+    color:var(--lime-deep);
+    font-size:0.95rem;
+    font-weight:500;
+  }
+  .section-head h2{font-size:clamp(1.25rem,2.2vw,1.6rem); font-weight:600;}
+  .lede{color:var(--ink-soft); max-width:66ch; margin:0 0 20px;}
+  p{max-width:70ch; margin:0 0 14px;}
+  .full p{max-width:none;}
+
+  h3.sub{font-size:1rem; font-weight:600; margin:22px 0 8px; color:var(--ink);}
+
+  ul.tick, ol.steps{margin:0 0 14px; padding-left:0; list-style:none; max-width:70ch;}
+  ul.tick li{
+    position:relative;
+    padding-left:22px;
+    margin-bottom:9px;
+  }
+  ul.tick li::before{
+    content:"";
+    position:absolute; left:0; top:0.55em;
+    width:7px; height:7px;
+    background:var(--lime);
+    border-radius:2px;
+    transform:rotate(45deg);
+  }
+
+  /* card grid */
+  .grid{display:grid; gap:14px; margin:18px 0;}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:760px){ .grid.cols-2, .grid.cols-3{grid-template-columns:1fr;} }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+    box-shadow:var(--shadow);
+  }
+  .card h4{margin:0 0 6px; font-size:0.95rem; font-family:"Public Sans"; font-weight:700; color:var(--deep);}
+  .card p{margin:0; font-size:0.9rem; color:var(--ink-soft); max-width:none;}
+  .card .tag{
+    display:inline-block;
+    font-family:"JetBrains Mono", monospace;
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--lime-deep);
+    margin-bottom:6px;
+  }
+
+  /* tables */
+  .tbl-wrap{overflow-x:auto; margin:16px 0;}
+  table{border-collapse:collapse; width:100%; font-size:0.88rem; min-width:520px;}
+  table caption{text-align:left; font-size:0.78rem; color:var(--ink-soft); margin-bottom:6px;}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{
+    font-family:"JetBrains Mono", monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+    font-weight:500;
+    background:var(--surface-2);
+  }
+  td.mono{font-family:"JetBrains Mono", monospace; font-size:0.82rem;}
+
+  /* roadmap */
+  .roadmap{display:flex; flex-direction:column; gap:0; margin:18px 0;}
+  .rm-item{
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:16px;
+    padding:16px 0;
+    border-top:1px solid var(--line);
+  }
+  .rm-item:first-child{border-top:none;}
+  .rm-phase{font-family:"JetBrains Mono", monospace; color:var(--lime-deep); font-size:0.82rem; padding-top:2px;}
+  .rm-item h4{margin:0 0 6px; font-size:1rem; color:var(--deep);}
+  .rm-item p{margin:0; font-size:0.9rem; color:var(--ink-soft);}
+
+  /* callouts */
+  .callout{
+    border:1px solid var(--line);
+    background:var(--surface-2);
+    border-radius:12px;
+    padding:16px 18px;
+    margin:16px 0;
+    font-size:0.9rem;
+  }
+  .callout.legal{border-left:3px solid var(--deep);}
+  .callout strong{color:var(--deep);}
+
+  /* coupon */
+  .coupon{
+    display:flex;
+    align-items:center;
+    gap:0;
+    margin:20px 0;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+  }
+  .coupon-main{
+    flex:1;
+    background:var(--surface);
+    padding:20px 22px;
+  }
+  .coupon-main .day{
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .coupon-main .pct{
+    font-family:"Fraunces", serif;
+    font-size:2.2rem;
+    color:var(--deep);
+    font-weight:600;
+    line-height:1.1;
+  }
+  .coupon-stub{
+    width:160px;
+    background:linear-gradient(160deg, var(--lime) 0%, var(--deep) 100%);
+    color:#fff;
+    padding:20px 16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    position:relative;
+  }
+  .coupon-stub .code{font-family:"JetBrains Mono", monospace; font-size:0.95rem; letter-spacing:0.03em;}
+  .coupon-stub .req{font-size:0.65rem; margin-top:6px; opacity:0.85;}
+  @media (max-width:600px){ .coupon{flex-direction:column;} .coupon-stub{width:100%;} }
+
+  /* price compare */
+  .price-compare{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    margin:18px 0;
+    box-shadow:var(--shadow);
+  }
+  .price-compare .pc-cell{
+    background:var(--surface);
+    padding:16px 18px;
+  }
+  .price-compare .pc-head{
+    background:var(--surface-2);
+    font-family:"JetBrains Mono", monospace;
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--ink-soft);
+    padding:10px 18px;
+  }
+  .price-compare .producto{font-weight:600; font-size:0.9rem;}
+  .price-compare .precio-general{
+    font-family:"JetBrains Mono", monospace;
+    color:var(--ink-soft);
+    text-decoration:line-through;
+    font-size:0.95rem;
+  }
+  .price-compare .precio-club{
+    font-family:"JetBrains Mono", monospace;
+    color:var(--deep);
+    font-weight:700;
+    font-size:1rem;
+  }
+  .price-compare .precio-club .badge{
+    display:inline-block;
+    background:var(--lime);
+    color:#0F3D33;
+    font-family:"Public Sans";
+    font-weight:700;
+    font-size:0.62rem;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    padding:2px 7px;
+    border-radius:999px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .price-compare .ahorro{color:var(--gold); font-weight:600; font-size:0.88rem;}
+  @media (max-width:600px){
+    .price-compare{grid-template-columns:1fr; }
+    .price-compare .pc-head{display:none;}
+    .price-compare .pc-cell::before{
+      content:attr(data-label);
+      display:block;
+      font-family:"JetBrains Mono", monospace;
+      font-size:0.62rem;
+      text-transform:uppercase;
+      color:var(--ink-soft);
+      margin-bottom:4px;
+    }
+  }
+
+  footer{
+    padding:30px 0 60px;
+    color:var(--ink-soft);
+    font-size:0.8rem;
+    border-top:1px solid var(--line);
+  }
+
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    nav.toc{
+      position:sticky; top:0; z-index:5;
+      flex-direction:row;
+      overflow-x:auto;
+      background:var(--paper);
+      padding:10px 0;
+      border-bottom:1px solid var(--line);
+      gap:4px;
+    }
+    nav.toc a{white-space:nowrap; border-left:none; border-bottom:2px solid transparent;}
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <div class="brand-mark">case</div>
+      <div class="kicker">Caso de estudio TARS · Plan de marca &amp; negocio</div>
+      <h1>Dietética CASE</h1>
+    </div>
+    <div class="meta">
+      Caso de ejemplo de TARS<br>
+      Santa Fe, Argentina · Septiembre 2026<br>
+      Cliente ficticio · Alimentación fitness / dietética
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <a href="#resumen"><span class="num">00</span>Resumen ejecutivo</a>
+      <a href="#identidad"><span class="num">01</span>Identidad de marca</a>
+      <a href="#redes"><span class="num">02</span>Instagram &amp; Facebook</a>
+      <a href="#sitio"><span class="num">03</span>Sitio y tienda online</a>
+      <a href="#club"><span class="num">04</span>Club CASE</a>
+      <a href="#drop"><span class="num">05</span>Drop semanal</a>
+      <a href="#cupon"><span class="num">06</span>Cupón miércoles</a>
+      <a href="#operaciones"><span class="num">07</span>Operaciones</a>
+      <a href="#confianza"><span class="num">08</span>Confianza de marca</a>
+      <a href="#hoja-de-ruta"><span class="num">09</span>Hoja de ruta</a>
+      <a href="#kpis"><span class="num">10</span>Indicadores</a>
+    </nav>
+
+    <main>
+
+      <section id="resumen">
+        <div class="section-head"><span class="section-num">00</span><h2>Resumen ejecutivo</h2></div>
+        <p class="lede">CASE es una dietética de alimentación fitness que combina venta física y online bajo una sola identidad de marca. El plan se apoya en tres motores que se refuerzan entre sí:</p>
+        <div class="grid cols-3">
+          <div class="card">
+            <span class="tag">Motor 1</span>
+            <h4>Ecosistema digital coherente</h4>
+            <p>Instagram, Facebook y sitio web con el mismo tono, paleta y catálogo — cada canal cumple un rol distinto pero reconocible.</p>
+          </div>
+          <div class="card">
+            <span class="tag">Motor 2</span>
+            <h4>Club CASE + drop semanal</h4>
+            <p>Suscripción por email y DNI que da acceso a precios cuidados permanentes y alimenta un newsletter semanal con contenido de valor y un gancho de compra.</p>
+          </div>
+          <div class="card">
+            <span class="tag">Motor 3</span>
+            <h4>Cupón del miércoles</h4>
+            <p>5% de descuento el día de menor venta, exclusivo para suscriptos — convierte el día flojo en el día de más altas.</p>
+          </div>
+        </div>
+        <p>Todo el sistema se sostiene con dos planillas operativas (suscriptores y stock, entregadas junto a este plan) y con señales visibles de profesionalismo — equipo a la vista, políticas claras, atención al cliente — que en un rubro de alimentación y salud son las que generan la confianza necesaria para que alguien compre online sin haber pisado el local.</p>
+      </section>
+
+      <section id="identidad">
+        <div class="section-head"><span class="section-num">01</span><h2>Identidad de marca</h2></div>
+        <p class="lede">El isologo ya define un punto de partida: minúsculas conectadas, curvas suaves y un degradé verde lima → verde profundo. El resto de la identidad debería sostener esa misma tensión entre energía (fitness) y seriedad (confianza alimentaria).</p>
+
+        <h3 class="sub">Propuesta de valor</h3>
+        <p>Una frase que combine resultado + honestidad del producto. Tres candidatas para testear con clientes reales:</p>
+        <ul class="tick">
+          <li><strong>"Comida real para objetivos reales."</strong> — pone el foco en que no son productos ultraprocesados disfrazados de fitness.</li>
+          <li><strong>"Tu dieta, sin vueltas."</strong> — apela a la practicidad de comprar resuelto lo que antes se cocinaba.</li>
+          <li><strong>"Nutrición con nombre y apellido."</strong> — conecta directamente con el pilar de equipo visible (sección 08).</li>
+        </ul>
+
+        <h3 class="sub">Personalidad y tono de voz</h3>
+        <p>Cercana pero no informal al punto de restar seriedad. En redes, segunda persona ("vos", como se habla en Santa Fe), directa y con humor moderado. En el sitio y en políticas, tono más técnico: fichas nutricionales, alérgenos y condiciones de compra sin ambigüedad.</p>
+
+        <h3 class="sub">Paleta (derivada del isologo)</h3>
+        <div class="grid cols-3">
+          <div class="card"><span class="tag mono">#8FCB3C</span><h4>Lima</h4><p>Energía, frescura. Úsalo en CTAs, highlights de Instagram y el badge del cupón.</p></div>
+          <div class="card"><span class="tag mono">#0F3D33</span><h4>Verde profundo</h4><p>Seriedad y confianza. Fondos oscuros, textos de marca, uniforme del equipo.</p></div>
+          <div class="card"><span class="tag mono">#F7F8F2</span><h4>Hueso</h4><p>Fondo neutro cálido para packaging, sitio y email — nunca blanco puro, que enfría la propuesta.</p></div>
+        </div>
+
+        <h3 class="sub">Tipografía</h3>
+        <p>Un par con la misma lógica que el isologo: una fuente con curvas cálidas para títulos (ej. <em>Fraunces</em> o <em>Recoleta</em>) y una sans utilitaria muy legible para cuerpo y fichas nutricionales (ej. <em>Public Sans</em> o <em>Inter</em>). Reservar una monoespaciada solo para códigos de cupón y datos tabulares (precios, stock).</p>
+
+        <h3 class="sub">Fotografía e íconos</h3>
+        <p>Fotografiar producto real siempre con la misma luz y fondo (evitar stock genérico de "fitness food"). Set de íconos de línea simple para categorías: proteína, vegano, sin TACC, keto, apto diabéticos — se reutiliza en Instagram, sitio y fichas de producto.</p>
+      </section>
+
+      <section id="redes">
+        <div class="section-head"><span class="section-num">02</span><h2>Instagram &amp; Facebook</h2></div>
+        <p class="lede">Instagram vende la marca día a día; Facebook sostiene catálogo, atención y un público algo mayor. Ninguno reemplaza al sitio — ambos empujan tráfico hacia él.</p>
+
+        <h3 class="sub">Instagram</h3>
+        <ul class="tick">
+          <li><strong>Bio:</strong> propuesta de valor en una línea + zona de reparto/horario + link único a la tienda (o Linktree con: Catálogo, Sumate al Club, Menú semanal).</li>
+          <li><strong>Highlights fijos:</strong> Menú · Cómo comprar · Club CASE · Testimonios · Preguntas frecuentes.</li>
+          <li><strong>Cadencia:</strong> 4–5 publicaciones por semana + historias diarias; 2 Reels semanales (elaboración de producto, equipo, mitos nutricionales).</li>
+        </ul>
+        <div class="grid cols-3">
+          <div class="card"><span class="tag">Pilar</span><h4>Menú semanal</h4><p>Productos y combos de la semana, con precio y stock disponible.</p></div>
+          <div class="card"><span class="tag">Pilar</span><h4>Educación nutricional</h4><p>Mitos y verdades, cómo leer una etiqueta, aportes de cada categoría.</p></div>
+          <div class="card"><span class="tag">Pilar</span><h4>Equipo y proceso</h4><p>Quién cocina, quién asesora — sostiene el pilar de confianza (sección 08).</p></div>
+          <div class="card"><span class="tag">Pilar</span><h4>Testimonios</h4><p>Clientes reales, con nombre y foto (con permiso), nunca promesas médicas.</p></div>
+          <div class="card"><span class="tag">Pilar</span><h4>Club &amp; cupón</h4><p>Recordatorio semanal del drop y del cupón de miércoles, con CTA a suscribirse.</p></div>
+        </div>
+
+        <h3 class="sub">Facebook</h3>
+        <ul class="tick">
+          <li>Catálogo sincronizado con el sitio vía Meta Commerce Manager, para que también se pueda navegar sin salir de Facebook.</li>
+          <li>Canal de reseñas y atención (mensajes/comentarios) — sumar a las políticas de respuesta de la sección 08.</li>
+          <li>Anuncios locales segmentados por zona de reparto y eventos puntuales (degustaciones, lanzamiento de línea nueva).</li>
+        </ul>
+      </section>
+
+      <section id="sitio">
+        <div class="section-head"><span class="section-num">03</span><h2>Sitio y tienda online</h2></div>
+        <p class="lede">El sitio es el único lugar donde conviven catálogo, pago y alta al Club CASE. Necesita verse serio incluso para quien nunca pisó el local.</p>
+
+        <h3 class="sub">Mapa del sitio</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Sección</th><th>Contenido</th></tr></thead>
+            <tbody>
+              <tr><td>Inicio</td><td>Propuesta de valor, producto destacado de la semana, banner del cupón de miércoles, CTA de suscripción.</td></tr>
+              <tr><td>Catálogo</td><td>Por categoría — proteínas, snacks fit, panificados dietéticos, dietas especiales, bebidas, packs.</td></tr>
+              <tr><td>Ficha de producto</td><td>Info nutricional, alérgenos, stock disponible, productos relacionados — y las dos etiquetas de precio: general y Club CASE (ver sección 04).</td></tr>
+              <tr><td>Carrito / checkout</td><td>Medios de pago, campo para código de cupón, cálculo de envío o retiro en local.</td></tr>
+              <tr><td>Club CASE</td><td>Formulario de alta (email + DNI), beneficios de suscribirse.</td></tr>
+              <tr><td>Nosotros</td><td>Equipo con nombre y foto, historia de la marca.</td></tr>
+              <tr><td>Preguntas frecuentes / Políticas</td><td>Cambios, devoluciones, tiempos y zonas de entrega.</td></tr>
+              <tr><td>Contacto</td><td>Ubicación del local, horarios, WhatsApp/email de atención.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">Medios de pago</h3>
+        <ul class="tick">
+          <li><strong>Débito y crédito:</strong> pasarela integrada (Mercado Pago es el estándar más aceptado en Argentina) para pago online con tarjeta.</li>
+          <li><strong>Efectivo:</strong> retiro en local con pago en caja, o pago contra-entrega dentro de la zona de reparto.</li>
+          <li>Mostrar los tres medios con íconos claros en el checkout — la ambigüedad en el pago es una de las causas más comunes de abandono de carrito.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Elementos de confianza en el sitio:</strong> sello de "compra segura", política de cambios/devolución visible antes de pagar (no solo en letra chica), tiempos de entrega estimados por zona, equipo con nombre real, y reseñas de clientes verificadas — no solo estrellas sin contexto.
+        </div>
+      </section>
+
+      <section id="club">
+        <div class="section-head"><span class="section-num">04</span><h2>Club CASE (suscripción)</h2></div>
+        <p class="lede">La puerta de entrada al drop semanal y al cupón de miércoles. El formulario debe ser corto pero suficiente para segmentar y para controlar el uso del cupón.</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Campos del formulario de alta</caption>
+            <thead><tr><th>Campo</th><th>Para qué se usa</th></tr></thead>
+            <tbody>
+              <tr><td>Nombre y apellido</td><td>Personalizar el email del drop semanal.</td></tr>
+              <tr><td>Email</td><td>Canal de envío del drop y del código de cupón.</td></tr>
+              <tr><td>DNI</td><td>Identificador único para que el cupón del miércoles no se canjee más de una vez por persona.</td></tr>
+              <tr><td>Preferencia alimentaria</td><td>Segmento (vegano, keto, deportista, sin TACC, general) para personalizar contenido del drop.</td></tr>
+              <tr><td>Consentimiento</td><td>Casilla obligatoria de aceptación de comunicaciones, con opción de baja en cada email.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout legal">
+          <strong>Nota legal:</strong> al pedir DNI y email, el aviso de privacidad del formulario debe explicar para qué se usan esos datos y ofrecer la baja, conforme a la Ley 25.326 de Protección de Datos Personales. No compartir ni publicar el DNI de los suscriptores — uso interno exclusivo para validar el cupón.
+        </div>
+
+        <p>Flujo de alta: formulario (sitio o local) → confirmación automática por email con bienvenida y el primer cupón de cortesía → ingreso a la base de suscriptores (planilla de la sección 07).</p>
+
+        <h3 class="sub">Precios cuidados: la diferencia de ser socio</h3>
+        <p>Además del cupón de los miércoles, el Club tiene que notarse en el precio de todos los días. La idea es mostrar siempre dos precios lado a lado — el general (el que ve cualquier visitante) y el "precio cuidado" del Club CASE (un descuento permanente, más chico que el del miércoles, visible solo para quien inició sesión como socio) — para que la diferencia sea evidente en el mismo momento en que alguien decide si suscribirse o no.</p>
+
+        <div class="price-compare">
+          <div class="pc-head">Producto</div>
+          <div class="pc-head">Precio general</div>
+          <div class="pc-head">Precio cuidado Club CASE</div>
+
+          <div class="pc-cell producto" data-label="Producto">Barra proteica cacao</div>
+          <div class="pc-cell" data-label="Precio general"><span class="precio-general">$2.200</span></div>
+          <div class="pc-cell" data-label="Precio Club CASE"><span class="precio-club">$2.070<span class="badge">Socio</span></span><br><span class="ahorro">Ahorrás $130 (6%)</span></div>
+
+          <div class="pc-cell producto" data-label="Producto">Pan sin TACC x500g</div>
+          <div class="pc-cell" data-label="Precio general"><span class="precio-general">$3.500</span></div>
+          <div class="pc-cell" data-label="Precio Club CASE"><span class="precio-club">$3.290<span class="badge">Socio</span></span><br><span class="ahorro">Ahorrás $210 (6%)</span></div>
+
+          <div class="pc-cell producto" data-label="Producto">Bowl keto pollo</div>
+          <div class="pc-cell" data-label="Precio general"><span class="precio-general">$4.800</span></div>
+          <div class="pc-cell" data-label="Precio Club CASE"><span class="precio-club">$4.510<span class="badge">Socio</span></span><br><span class="ahorro">Ahorrás $290 (6%)</span></div>
+        </div>
+
+        <ul class="tick">
+          <li><strong>En el catálogo y la ficha de producto:</strong> mostrar el precio general tachado junto al precio cuidado destacado en verde lima, con la etiqueta "Socio" — así un visitante sin cuenta ve exactamente cuánto se ahorraría si se suscribe, antes de decidir comprar.</li>
+          <li><strong>En el carrito:</strong> una línea de resumen tipo "Ahorraste $X por ser socio CASE" al pie del total, para reforzar el valor del Club en cada compra, no solo en la landing de suscripción.</li>
+          <li><strong>En el local físico:</strong> cartel de precio con el mismo formato de dos columnas (general / socio), y en caja se aplica el precio cuidado al validar el DNI contra la planilla de suscriptores.</li>
+          <li><strong>Relación con el cupón de miércoles:</strong> el 5% de la sección 06 se suma sobre el precio cuidado del Club ese día puntual — no reemplaza el descuento permanente, lo profundiza.</li>
+        </ul>
+        <p style="font-size:0.82rem;color:var(--ink-soft);">*Los valores de la tabla son ilustrativos, tomados de los productos de ejemplo de la planilla de stock — el porcentaje real de "precio cuidado" (acá 6%) queda a definir según margen.</p>
+      </section>
+
+      <section id="drop">
+        <div class="section-head"><span class="section-num">05</span><h2>El Drop semanal</h2></div>
+        <p class="lede">Un email por semana, siempre el mismo día, con una estructura fija para que se vuelva reconocible — y con un gancho real en el asunto, no genérico.</p>
+
+        <h3 class="sub">Estructura del email</h3>
+        <ol class="steps">
+          <li><strong>Asunto (el gancho):</strong> una promesa concreta, nunca "Novedades de la semana".</li>
+          <li><strong>Bloque 1 — Dieta especial de la semana:</strong> un menú o protocolo temático (ej. "3 días de reset post-findes" o "Semana alta en proteína").</li>
+          <li><strong>Bloque 2 — Producto tendencia:</strong> un producto puntual con CTA directo de compra.</li>
+          <li><strong>Bloque 3 — Recordatorio del cupón:</strong> el código del miércoles, con cuenta regresiva.</li>
+          <li><strong>Cierre:</strong> un testimonio corto o un dato nutricional curioso — cierra en tono cercano, no comercial.</li>
+        </ol>
+
+        <h3 class="sub">Ganchos de asunto (ejemplos)</h3>
+        <ul class="tick">
+          <li>"Este miércoles, tu changuito rinde un 5% más"</li>
+          <li>"La dieta que más pedís esta semana (y cómo armarla en 10 min)"</li>
+          <li>"3 productos que se están agotando esta semana"</li>
+          <li>"Lo que comerías si tuvieras 15 minutos y ganas de comer bien"</li>
+          <li>"Tu cupón del miércoles ya está activo"</li>
+        </ul>
+
+        <h3 class="sub">Calendario editorial de ejemplo (4 semanas)</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Semana</th><th>Dieta especial</th><th>Producto tendencia</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Reset post-findes</td><td>Bowl proteico</td></tr>
+              <tr><td>2</td><td>Alta en proteína / deportista</td><td>Barra proteica</td></tr>
+              <tr><td>3</td><td>Sin TACC</td><td>Pan dietético</td></tr>
+              <tr><td>4</td><td>Vegana de temporada</td><td>Pack de snacks veganos</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Envío sugerido: lunes a la mañana — deja tiempo para planificar la semana y llega antes del cupón del miércoles.</p>
+      </section>
+
+      <section id="cupon">
+        <div class="section-head"><span class="section-num">06</span><h2>Cupón miércoles activo</h2></div>
+        <p class="lede">El miércoles es, según el propio negocio, el día de menor venta. En vez de bajar precios todos los días (lo que erosiona margen), el descuento se concentra ahí — y se usa como imán de suscripción.</p>
+
+        <div class="coupon">
+          <div class="coupon-main">
+            <div class="day">Válido solo los miércoles</div>
+            <div class="pct">5% OFF</div>
+            <p style="margin-top:6px;">En local y en la tienda online, sobre el total de la compra.</p>
+          </div>
+          <div class="coupon-stub">
+            <div class="code">CASE-MIE</div>
+            <div class="req">Requiere ser<br>socio del Club</div>
+          </div>
+        </div>
+
+        <h3 class="sub">Mecánica</h3>
+        <ol class="steps">
+          <li>El código llega en el drop semanal del lunes, con fecha de vencimiento el mismo miércoles.</li>
+          <li><strong>Online:</strong> se ingresa en el campo de cupón del checkout.</li>
+          <li><strong>En local:</strong> se muestra el email o se dice el código en caja; el personal lo valida contra la planilla de suscriptores.</li>
+          <li>Se registra la fecha de canje en la planilla (columna dedicada) para evitar que se use dos veces el mismo miércoles.</li>
+        </ol>
+        <p>El requisito de estar suscripto convierte cada canje en una alta potencial a la base de datos, y el hecho de que sea un solo día evita que el descuento se perciba como el precio "real" del producto.</p>
+      </section>
+
+      <section id="operaciones">
+        <div class="section-head"><span class="section-num">07</span><h2>Operaciones</h2></div>
+        <p class="lede">Dos planillas acompañan este plan, ya armadas con fórmulas — solo hay que cargar los datos reales.</p>
+
+        <div class="grid cols-2">
+          <div class="card">
+            <span class="tag">Archivo 1</span>
+            <h4>suscriptores_case.xlsx</h4>
+            <p>Nombre, apellido, email, DNI, fecha de alta, canal, segmento, consentimiento, último canje del cupón y estado. Incluye una hoja de resumen con totales y distribución por segmento, calculada automáticamente.</p>
+          </div>
+          <div class="card">
+            <span class="tag">Archivo 2</span>
+            <h4>stock_case.xlsx</h4>
+            <p>SKU, producto, categoría, precio, costo, stock actual/mínimo, proveedor y fecha. La columna "Estado" marca "Reponer" en rojo automáticamente cuando el stock cae debajo del mínimo. Incluye resumen con valor total de inventario.</p>
+          </div>
+        </div>
+        <p>Frecuencia sugerida de actualización: stock al cierre de cada día (o al recibir mercadería), suscriptores en el momento de cada alta o canje de cupón.</p>
+      </section>
+
+      <section id="confianza">
+        <div class="section-head"><span class="section-num">08</span><h2>Confianza y seriedad de marca</h2></div>
+        <p class="lede">En alimentación y salud, la percepción de que "hay un equipo serio detrás" es lo que decide si alguien compra online sin haber visitado el local antes.</p>
+        <ul class="tick">
+          <li><strong>Equipo visible:</strong> nombres, roles y fotos reales en el sitio y en redes — no una marca anónima.</li>
+          <li><strong>Políticas claras:</strong> cambios, devoluciones, zona y tiempos de entrega, visibles antes de la compra, no escondidos en letra chica.</li>
+          <li><strong>Prueba social responsable:</strong> testimonios con nombre y foto (con permiso), sin prometer resultados médicos ni de salud que la marca no pueda respaldar.</li>
+          <li><strong>Atención al cliente:</strong> un canal único de consultas (WhatsApp Business o email dedicado) con un tiempo de respuesta comprometido y visible, por ejemplo menos de 24 horas.</li>
+          <li><strong>Consistencia visual:</strong> el mismo logo, paleta y tono en Instagram, Facebook, sitio y email del drop — nunca una versión distinta del isologo en cada canal.</li>
+        </ul>
+      </section>
+
+      <section id="hoja-de-ruta">
+        <div class="section-head"><span class="section-num">09</span><h2>Hoja de ruta de implementación</h2></div>
+        <p class="lede">Cuatro fases para no intentar lanzar todo al mismo tiempo.</p>
+        <div class="roadmap">
+          <div class="rm-item">
+            <div class="rm-phase">Semana<br>1–2</div>
+            <div>
+              <h4>Identidad cerrada</h4>
+              <p>Paleta, tipografía y manual básico de marca. Apertura o reordenamiento de Instagram y Facebook con bio, highlights y primeras plantillas de contenido.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-phase">Semana<br>3–4</div>
+            <div>
+              <h4>Sitio y catálogo en línea</h4>
+              <p>Publicación del sitio con catálogo y checkout (puede arrancar con un link de pago de Mercado Pago si integrar el checkout completo lleva más tiempo). Formulario del Club CASE activo. Planillas de stock y suscriptores en uso diario.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-phase">Mes<br>2</div>
+            <div>
+              <h4>Automatización del drop</h4>
+              <p>Migrar el envío semanal a una plataforma de email marketing (ej. Mailchimp o Brevo) conectada a la planilla o formulario de suscriptores. Lanzamiento oficial del cupón de miércoles. Primeras campañas de Ads locales.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-phase">Mes<br>3</div>
+            <div>
+              <h4>Revisión con datos</h4>
+              <p>Primer corte de los indicadores de la sección 10. Ajustar contenido del drop y pilares de Instagram según lo que realmente convierte. Evaluar sumar delivery propio o un segundo medio de pago.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="kpis">
+        <div class="section-head"><span class="section-num">10</span><h2>Indicadores a monitorear</h2></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Indicador</th><th>De dónde sale</th></tr></thead>
+            <tbody>
+              <tr><td>Nuevos suscriptores por semana</td><td>Planilla de suscriptores — filas nuevas por fecha de alta.</td></tr>
+              <tr><td>Tasa de apertura y clics del drop</td><td>Plataforma de email marketing, una vez migrado el envío.</td></tr>
+              <tr><td>% de canje del cupón de miércoles</td><td>Columna "último canje" de la planilla de suscriptores.</td></tr>
+              <tr><td>Ventas del miércoles vs. resto de la semana</td><td>Comparar antes y después del lanzamiento del cupón.</td></tr>
+              <tr><td>Productos con alerta de reposición</td><td>Columna "Estado" de la planilla de stock.</td></tr>
+              <tr><td>Conversión de visita a compra en el sitio</td><td>Analítica del sitio (ej. Google Analytics o el panel de la plataforma elegida).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    Plan de acción de TARS para el desarrollo de marca de CASE (caso ficticio) — dietética de alimentación fitness.
+    <a href="https://claude.ai/code/artifact/bdf898da-523f-4c67-a2f9-99f1f939fae1">Ver el mockup de Instagram →</a>
+  </footer>
+</div>

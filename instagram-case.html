@@ -1,0 +1,423 @@
+<title>CASE en Instagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600&display=swap');
+
+  :root{
+    --ink:#121317;
+    --paper:#FAFAFA;
+    --surface:#FFFFFF;
+    --line:#E4E4E7;
+    --soft:#6B6B75;
+    --accent:#4F52FF;
+    --accent-soft:#EEEEFF;
+    --shadow:0 1px 2px rgba(18,19,23,0.05), 0 12px 32px rgba(18,19,23,0.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#F2F2F5;
+      --paper:#0C0C0F;
+      --surface:#17171C;
+      --line:#2A2A31;
+      --soft:#9A9AA5;
+      --accent:#8688FF;
+      --accent-soft:#22223A;
+      --shadow:0 1px 2px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#F2F2F5;
+    --paper:#0C0C0F;
+    --surface:#17171C;
+    --line:#2A2A31;
+    --soft:#9A9AA5;
+    --accent:#8688FF;
+    --accent-soft:#22223A;
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.4);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    padding:0 20px;
+    line-height:1.55;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+  .mono{font-family:"JetBrains Mono", ui-monospace, monospace;}
+
+  /* ---- case-study header ---- */
+  header.case{
+    padding:48px 0 30px;
+    border-bottom:1px solid var(--line);
+  }
+  .tars-mark{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:"Archivo", sans-serif;
+    font-weight:900;
+    font-size:1rem;
+    letter-spacing:0.02em;
+  }
+  .tars-mark .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    font-size:0.7rem;
+    color:var(--soft);
+    font-weight:600;
+    margin-top:16px;
+  }
+  h1{
+    font-family:"Archivo", sans-serif;
+    font-weight:900;
+    font-size:clamp(2rem,5vw,3.2rem);
+    line-height:1.05;
+    margin:10px 0 14px;
+    text-wrap:balance;
+    max-width:16ch;
+  }
+  .brief{
+    color:var(--soft);
+    max-width:62ch;
+    font-size:1.02rem;
+    margin:0 0 22px;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .meta-tag{
+    font-family:"JetBrains Mono", monospace;
+    font-size:0.72rem;
+    color:var(--soft);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px 14px;
+  }
+  .meta-tag b{color:var(--ink); font-weight:600;}
+  .disclaimer{
+    margin-top:22px;
+    font-size:0.82rem;
+    color:var(--soft);
+    border-left:2px solid var(--accent);
+    padding-left:12px;
+    max-width:60ch;
+  }
+
+  /* ---- phone mockup (fixed light UI, represents a real screenshot) ---- */
+  .phone-stage{
+    display:flex;
+    justify-content:center;
+    padding:44px 0 20px;
+  }
+  .phone{
+    width:340px;
+    max-width:100%;
+    background:#0b0b0d;
+    border-radius:46px;
+    padding:14px;
+    box-shadow:0 40px 70px rgba(15,15,20,0.35), 0 4px 10px rgba(15,15,20,0.2);
+    position:relative;
+  }
+  .phone::before{
+    content:"";
+    position:absolute;
+    top:14px; left:50%; transform:translateX(-50%);
+    width:120px; height:24px;
+    background:#0b0b0d;
+    border-radius:0 0 18px 18px;
+    z-index:3;
+  }
+  .screen{
+    background:#ffffff;
+    color:#111111;
+    border-radius:34px;
+    overflow:hidden;
+    font-family:"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  }
+  .statusbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 22px 2px;
+    font-size:12.5px;font-weight:600;
+  }
+  .statusbar .icons{display:flex;gap:6px;align-items:center;}
+  .sig-bars{display:flex;align-items:flex-end;gap:1.5px;height:9px;}
+  .sig-bars span{width:2.5px;background:#111;border-radius:1px;}
+  .sig-bars span:nth-child(1){height:40%;}
+  .sig-bars span:nth-child(2){height:60%;}
+  .sig-bars span:nth-child(3){height:80%;}
+  .sig-bars span:nth-child(4){height:100%;}
+  .battery{
+    width:22px;height:11px;border:1px solid #111;border-radius:2.5px;
+    position:relative;padding:1.5px;
+  }
+  .battery::after{content:"";position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#111;border-radius:0 1px 1px 0;}
+  .battery i{display:block;width:75%;height:100%;background:#111;border-radius:1px;}
+  .ig-topbar{
+    display:flex;align-items:center;justify-content:center;gap:5px;
+    padding:8px 16px 4px;
+    font-weight:700;
+    font-size:15px;
+  }
+  .ig-topbar .lock{font-size:11px;opacity:0.6;}
+  .profile-row{
+    display:flex;align-items:center;gap:0;
+    padding:14px 16px 10px;
+    justify-content:space-between;
+  }
+  .avatar{
+    width:76px;height:76px;border-radius:50%;
+    background:radial-gradient(circle at 30% 20%, #8FCB3C 0%, #0F3D33 100%);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-family:"Fraunces",serif;font-weight:600;font-size:0.85rem;
+    flex-shrink:0;
+    border:2px solid #fff;
+    box-shadow:0 0 0 1px #eee;
+  }
+  .stats{display:flex;flex:1;justify-content:space-around;text-align:center;}
+  .stats div strong{display:block;font-size:16px;}
+  .stats div span{font-size:11.5px;color:#4a4a4a;}
+  .bio-block{padding:0 16px 10px;font-size:13px;line-height:1.45;}
+  .bio-block .name{font-weight:700;}
+  .bio-block .cat{color:#737373;font-size:12.5px;}
+  .bio-block a{color:#00376b;text-decoration:none;font-weight:500;}
+  .profile-actions{display:flex;gap:7px;padding:2px 16px 14px;}
+  .btn{
+    flex:1;text-align:center;padding:6px 0;border-radius:8px;
+    font-weight:600;font-size:13px;
+  }
+  .btn.primary{background:#0095f6;color:#fff;}
+  .btn.secondary{background:#efefef;color:#111;}
+  .highlights{
+    display:flex;gap:15px;padding:2px 16px 16px;overflow-x:auto;
+  }
+  .highlight{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;width:60px;flex-shrink:0;color:#333;}
+  .highlight .circle{
+    width:56px;height:56px;border-radius:50%;
+    border:1px solid #dbdbdb;
+    display:flex;align-items:center;justify-content:center;font-size:20px;
+    background:#fafafa;
+  }
+  .tabbar{display:flex;border-top:1px solid #dbdbdb;}
+  .tabbar div{flex:1;text-align:center;padding:9px 0;font-size:17px;color:#a8a8a8;}
+  .tabbar div.active{color:#111;border-top:1.5px solid #111;margin-top:-1.5px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:#000;}
+  .tile{
+    aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+    font-size:26px;color:rgba(255,255,255,0.92);position:relative;
+  }
+  .tile.reel::after{
+    content:"▶";position:absolute;top:6px;right:8px;font-size:10px;color:#fff;
+  }
+
+  /* ---- destacadas (post cards) ---- */
+  section.posts{padding:20px 0 50px;}
+  section.posts h2{
+    font-family:"Archivo", sans-serif; font-weight:900;
+    font-size:1.5rem; margin:0 0 6px;
+  }
+  section.posts .sub{color:var(--soft); margin:0 0 26px; max-width:60ch;}
+  .post-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+  }
+  @media (max-width:900px){ .post-grid{grid-template-columns:1fr;} }
+  .post-card{
+    background:#ffffff;
+    color:#111;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    font-size:13.5px;
+  }
+  .post-head{display:flex;align-items:center;gap:8px;padding:10px 12px;}
+  .post-head .mini-avatar{
+    width:28px;height:28px;border-radius:50%;
+    background:radial-gradient(circle at 30% 20%, #8FCB3C 0%, #0F3D33 100%);
+  }
+  .post-head b{font-size:13px;}
+  .post-image{
+    aspect-ratio:1;
+    display:flex;align-items:center;justify-content:center;
+    font-size:42px;color:#fff;
+  }
+  .post-actions{padding:10px 12px 2px;font-size:19px;color:#111;display:flex;gap:12px;}
+  .post-likes{padding:2px 12px 0;font-weight:700;font-size:13px;}
+  .post-caption{padding:6px 12px 4px;line-height:1.5;}
+  .post-caption b{font-weight:700;}
+  .post-hash{color:#00376b;}
+  .post-meta{padding:2px 12px 14px;color:#8e8e8e;font-size:11.5px;text-transform:uppercase;letter-spacing:0.03em;}
+
+  /* ---- closing ---- */
+  section.close{
+    border-top:1px solid var(--line);
+    padding:40px 0 60px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:20px;
+  }
+  section.close h3{
+    font-family:"Archivo", sans-serif;font-weight:900;
+    font-size:1.4rem;margin:0 0 8px;max-width:20ch;
+  }
+  section.close p{color:var(--soft);max-width:52ch;margin:0;}
+  .back-link{
+    font-family:"JetBrains Mono", monospace;
+    font-size:0.8rem;
+    color:var(--accent);
+    text-decoration:none;
+    border:1px solid var(--line);
+    padding:10px 16px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+</style>
+
+<div class="wrap">
+  <header class="case">
+    <div class="tars-mark"><span class="dot"></span>TARS</div>
+    <div class="eyebrow">Caso de estudio · Gestión de redes &amp; contenido</div>
+    <h1>CASE en Instagram</h1>
+    <p class="brief">Armamos la cuenta de Instagram de CASE, una dietética fitness, de punta a punta: bio, historias destacadas, grilla de contenido y las piezas que convierten seguidores en socios del Club. Así es como se ve un negocio con presencia real — pensado, escrito y diseñado por TARS.</p>
+    <div class="meta-row">
+      <span class="meta-tag">Cliente: <b>CASE</b> (caso ficticio)</span>
+      <span class="meta-tag">Servicio: <b>Instagram + contenido</b></span>
+      <span class="meta-tag">Formato: <b>Feed · Historias · Reels</b></span>
+    </div>
+    <p class="disclaimer">Este es un caso de ejemplo armado por TARS para mostrar nuestro trabajo — CASE no es un negocio real ni una cuenta activa.</p>
+  </header>
+
+  <div class="phone-stage">
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar">
+          <span>21:47</span>
+          <span class="icons">
+            <span class="sig-bars"><span></span><span></span><span></span><span></span></span>
+            <span>5G</span>
+            <span class="battery"><i></i></span>
+          </span>
+        </div>
+        <div class="ig-topbar">case.dietetica <span class="lock">▾</span></div>
+
+        <div class="profile-row">
+          <div class="avatar">case</div>
+          <div class="stats">
+            <div><strong>184</strong><span>Publicaciones</span></div>
+            <div><strong>6.842</strong><span>Seguidores</span></div>
+            <div><strong>312</strong><span>Seguidos</span></div>
+          </div>
+        </div>
+
+        <div class="bio-block">
+          <div class="name">CASE — Nutrición Real</div>
+          <div class="cat">Tienda de alimentos saludables</div>
+          🥑 Comida real para objetivos reales<br>
+          🎟️ Socios CASE: precios cuidados + cupón miércoles<br>
+          📍 Santa Fe, Argentina · Envíos y retiro en local<br>
+          👇 Catálogo y alta al Club<br>
+          <a href="#">case.com.ar</a>
+        </div>
+
+        <div class="profile-actions">
+          <div class="btn primary">Seguir</div>
+          <div class="btn secondary">Mensaje</div>
+          <div class="btn secondary">•••</div>
+        </div>
+
+        <div class="highlights">
+          <div class="highlight"><div class="circle">🍽️</div>Menú</div>
+          <div class="highlight"><div class="circle">🎟️</div>Club</div>
+          <div class="highlight"><div class="circle">🛒</div>Cómo pedir</div>
+          <div class="highlight"><div class="circle">👩‍🍳</div>Equipo</div>
+          <div class="highlight"><div class="circle">🗓️</div>Miércoles</div>
+        </div>
+
+        <div class="tabbar">
+          <div class="active">▦</div>
+          <div>▶</div>
+          <div>◎</div>
+        </div>
+
+        <div class="grid3">
+          <div class="tile" style="background:linear-gradient(135deg,#0F3D33,#1c5a49);">🍲</div>
+          <div class="tile" style="background:linear-gradient(135deg,#C8933A,#8a5f1f);">🎟️</div>
+          <div class="tile" style="background:linear-gradient(135deg,#8a7a63,#5c4f3d);">👩‍🍳</div>
+
+          <div class="tile" style="background:linear-gradient(135deg,#8FCB3C,#5f8f28);">🍫</div>
+          <div class="tile" style="background:linear-gradient(135deg,#0F3D33,#C8933A);">🗓️</div>
+          <div class="tile" style="background:linear-gradient(135deg,#e8e4d8,#a9a493);color:#333;">💬</div>
+
+          <div class="tile" style="background:linear-gradient(135deg,#0F3D33,#2c6b56);">📋</div>
+          <div class="tile reel" style="background:linear-gradient(135deg,#6EA82C,#0F3D33);">🥗</div>
+          <div class="tile" style="background:linear-gradient(135deg,#d8c9a3,#a98b57);color:#333;">🍞</div>
+
+          <div class="tile" style="background:linear-gradient(135deg,#8FCB3C,#0F3D33);">🥬</div>
+          <div class="tile" style="background:linear-gradient(135deg,#9a9a9a,#5a5a5a);">📸</div>
+          <div class="tile" style="background:linear-gradient(135deg,#0F3D33,#8FCB3C);">🗒️</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="posts">
+    <h2>Piezas destacadas</h2>
+    <p class="sub">Tres publicaciones reales del calendario de contenido, mostrando cómo se escribe cada pilar: el beneficio del Club, el cupón semanal y la confianza en el equipo.</p>
+    <div class="post-grid">
+
+      <article class="post-card">
+        <div class="post-head"><div class="mini-avatar"></div><b>case.dietetica</b></div>
+        <div class="post-image" style="background:linear-gradient(135deg,#C8933A,#8a5f1f);">🎟️</div>
+        <div class="post-actions">♡ ⤵ ⌲</div>
+        <div class="post-likes">312 Me gusta</div>
+        <div class="post-caption">
+          <b>case.dietetica</b> Desde hoy, ser socio del Club CASE tiene un precio que se nota. Con tu suscripción accedés a precios cuidados todos los días — no solo los miércoles — y seguís sumando el cupón especial de mitad de semana. Sumarte lleva 2 minutos: link en bio 🔗<br>
+          <span class="post-hash">#ClubCASE #ComidaReal #DietéticaSantaFe #PrecioCuidado</span>
+        </div>
+        <div class="post-meta">48 comentarios · hace 2 días</div>
+      </article>
+
+      <article class="post-card">
+        <div class="post-head"><div class="mini-avatar"></div><b>case.dietetica</b></div>
+        <div class="post-image" style="background:linear-gradient(135deg,#0F3D33,#C8933A);">🗓️</div>
+        <div class="post-actions">♡ ⤵ ⌲</div>
+        <div class="post-likes">428 Me gusta</div>
+        <div class="post-caption">
+          <b>case.dietetica</b> Hoy es miércoles y ya sabés lo que significa: 5% OFF para socixs CASE, en el local y en la tienda online. Mostrá tu mail o ingresá el código que te llegó en El Drop de esta semana. ¿Todavía no sos socix? El próximo miércoles puede ser el tuyo 🥑<br>
+          <span class="post-hash">#CASE #MiércolesDeSocios #DietéticaSantaFe</span>
+        </div>
+        <div class="post-meta">61 comentarios · hace 5 horas</div>
+      </article>
+
+      <article class="post-card">
+        <div class="post-head"><div class="mini-avatar"></div><b>case.dietetica</b></div>
+        <div class="post-image" style="background:linear-gradient(135deg,#8a7a63,#5c4f3d);">👩‍🍳</div>
+        <div class="post-actions">♡ ⤵ ⌲</div>
+        <div class="post-likes">501 Me gusta</div>
+        <div class="post-caption">
+          <b>case.dietetica</b> Detrás de cada bowl hay alguien que lo pensó con vos en mente. Te presentamos a Caro, a cargo de nuestra cocina desde el día uno. Si tenés una consulta puntual sobre tu alimentación, escribinos — del otro lado hay un equipo, no un algoritmo.<br>
+          <span class="post-hash">#ConocéAlEquipo #CASE #NutriciónReal</span>
+        </div>
+        <div class="post-meta">37 comentarios · hace 1 semana</div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="close">
+    <div>
+      <h3>¿Tenés un negocio que vive de la confianza?</h3>
+      <p>Así trabajamos en TARS: definimos la identidad, armamos el contenido y lo ponemos a vender — no solo a acumular seguidores.</p>
+    </div>
+    <a class="back-link" href="https://claude.ai/code/artifact/1c69c253-348e-46a9-b5ae-4b034d69601c">Ver el plan de marca completo de CASE →</a>
+  </section>
+</div>

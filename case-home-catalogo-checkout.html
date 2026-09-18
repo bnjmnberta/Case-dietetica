@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASE Dietética</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --lime:#8FCB3C;
+    --lime-deep:#6EA82C;
+    /* Verde para TEXTO sobre fondo claro: --lime-deep no llega a 4.5:1, éste sí (6.3:1 sobre blanco). */
+    --lime-ink:#3F6B14;
+    --brand:#0F3D33;
+    --brand-2:#0A2B24;
+    --gold:#C8933A;
+    --ink:#16211C;
+    --ink-soft:#4B564E;
+    --bg:#F7F8F2;
+    --surface:#FFFFFF;
+    --surface-2:#EFF2E7;
+    --line:#DDE2D5;
+  }
+  *{box-sizing:border-box;}
+  html.lenis{ scroll-behavior:auto !important; }
+  html.lenis-smooth{ scroll-behavior:auto; }
+  .lenis.lenis-smooth iframe{ pointer-events:none; }
+  html{ scrollbar-color:var(--lime-deep) var(--surface-2); }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Public Sans", ui-sans-serif, system-ui, sans-serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{ font-family:"Fraunces", Georgia, serif; font-weight:600; text-wrap:balance; margin:0; }
+  p{margin:0;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  button{font-family:inherit;}
+  [hidden]{display:none!important;}
+  .wrap{max-width:1280px; margin:0 auto; padding:0 80px;}
+  @media (max-width:900px){ .wrap{ padding:0 24px; } }
+
+  ::selection{ background:var(--lime); color:var(--brand); }
+  :focus-visible{ outline:2.5px solid var(--brand); outline-offset:2px; border-radius:4px; }
+  ::-webkit-scrollbar{ width:12px; height:12px; }
+  ::-webkit-scrollbar-track{ background:var(--surface-2); }
+  ::-webkit-scrollbar-thumb{ background:var(--lime-deep); border-radius:999px; border:3px solid var(--surface-2); }
+
+  .mono{ font-family:"JetBrains Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important; }
+    html{ scroll-behavior:auto!important; }
+    .reveal-wipe{ display:none!important; }
+  }
+
+  svg.ic{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; display:block; }
+
+  .btn{ appearance:none; border:none; cursor:pointer; font-family:"Public Sans",sans-serif; font-weight:600; border-radius:16px; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:transform .15s ease, box-shadow .2s ease; white-space:nowrap; }
+  .btn:active{ transform:scale(.97); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-block{ width:100%; }
+
+  /* Logo wordmark */
+  .logo{ display:inline-flex; align-items:center; gap:6px; font-family:"Fraunces",Georgia,serif; font-weight:700; color:#fff; }
+  .logo .dot{ width:8px; height:8px; border-radius:50%; background:var(--lime); align-self:center; }
+  .logo-img{ display:block; height:28px; width:auto; }
+
+  /* ---------------- Hero (grainy gradient field with the phrase revealed over it) ---------------- */
+  .hero{
+    position:relative; min-height:100vh; overflow:hidden;
+    background:
+      radial-gradient(ellipse 60% 34% at 50% 40%, #F7F8F2 0%, #E0BC86 26%, #A8CE5A 52%, transparent 76%),
+      linear-gradient(180deg, #E9EEDB 0%, #A8CE5A 20%, #8FCB3C 40%, #2E6B52 72%, #0A2B24 100%);
+  }
+  .hero::before{
+    content:""; position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.22; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:180px 180px;
+  }
+
+  /* Fills the hero edge-to-edge (not just around the text) so its scrim never exposes raw
+     background below it — that gap was the hard seam right above the category bar. */
+  .hero-overlay{
+    position:absolute; inset:0; z-index:2;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    padding:72px 80px;
+    background: linear-gradient(180deg, rgba(10,43,36,0) 0%, rgba(10,43,36,0.75) 55%, rgba(10,43,36,0.95) 100%);
+  }
+  @media (max-width:900px){ .hero-overlay{ padding:56px 24px; } }
+  .hero-overlay .lede{ font-size:19px; line-height:1.55; color:rgba(247,248,242,0.9); max-width:52ch; margin:20px auto 0; }
+  /* DVD-screensaver box: fills the whole hero, edge to edge — the logo bounces across the full screen. */
+  /* Wide, not square — matches the wordmark's own proportions, so it can go this big
+     without turning into mostly empty padding above/below the letters. */
+  .hero-logo-wrap{ position:relative; width:min(88vw,1400px); aspect-ratio:2.8/1; margin-bottom:20px; }
+  .hero-logo{ display:block; position:absolute; inset:0; width:100%; height:100%; }
+  /* Static poster shown until the WebGL wordmark confirms a successful load — CDN failure,
+     no WebGL, or JS disabled all leave this in place instead of an empty hero. */
+  .hero-logo-fallback{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transition:opacity .3s ease; }
+  .hero-logo-fallback.is-hidden{ opacity:0; pointer-events:none; }
+  .hero-ctas{ display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:32px; }
+  .hero-ctas .btn{ padding:16px 30px; font-size:15px; }
+  .btn-lime{ background:var(--lime); color:var(--brand-2); }
+  .btn-lime:hover{ background:#A2D851; }
+  .btn-outline{ background:transparent; color:#fff; border:2px solid rgba(247,248,242,0.75); }
+  .btn-outline:hover{ background:rgba(247,248,242,0.14); }
+
+  .hero-reveal{
+    font-family:"Fraunces",Georgia,serif; font-weight:600;
+    font-size:clamp(1rem,2vw,1.7rem); line-height:1.1; letter-spacing:-0.02em;
+    color:#F7F8F2; width:100%; max-width:26ch; text-shadow:0 2px 18px rgba(10,43,36,0.45);
+  }
+  .hero-reveal .line{ position:relative; overflow:hidden; padding:0.06em 0; }
+  .hero-reveal strong{
+    /* Lima del dark mode documentado: #8FCB3C no llega a 3:1 sobre las zonas claras de la foto. */
+    font-weight:600; font-style:italic; color:#A9E361;
+  }
+  .reveal-wipe{ position:absolute; inset:0; background:var(--lime); z-index:2; pointer-events:none; }
+
+  /* ---------------- Category bar ---------------- */
+  /* Doubles as the site navbar: sticks to the top once you scroll past it, and shrinks
+     down from the roomy section padding to actual navbar height while it's pinned. */
+  .cat-bar{
+    position:sticky; top:0; z-index:20; background:var(--surface); border-bottom:1px solid var(--line);
+    padding:40px 80px; transition:box-shadow .25s ease;
+  }
+  .cat-bar.is-stuck{ padding:14px 80px; box-shadow:0 4px 20px rgba(15,61,51,0.08); }
+  @media (max-width:900px){
+    .cat-bar{ padding:24px 0; }
+    .cat-bar.is-stuck{ padding:10px 0; }
+    /* .cat-bar drops its own horizontal padding here, so the row must carry the edge inset
+       itself instead — otherwise tabs and the cart link sit flush against the bar's edges. */
+    .cat-bar-row{ padding:0 20px; }
+  }
+  .cat-bar-row{ display:flex; align-items:center; gap:20px; }
+  /* Horizontal-scroll at every width, not just mobile — wrapping to a second row at desktop
+     (once the cart link started sharing this row too) cost real above-the-fold space. */
+  .cat-tabs{
+    flex:1; min-width:0; display:flex; flex-wrap:nowrap; gap:12px; justify-content:flex-start;
+    overflow-x:auto; scroll-snap-type:x proximity;
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  .cat-tabs::-webkit-scrollbar{ display:none; }
+  .cat-tab{ flex:0 0 auto; scroll-snap-align:start; white-space:nowrap; }
+  @media (max-width:700px){ .cat-tabs{ padding:0 20px 4px; } }
+  .cat-tab{ appearance:none; cursor:pointer; border:1px solid var(--line); background:var(--bg); color:var(--ink-soft); font-family:"Public Sans",sans-serif; font-weight:600; font-size:15px; padding:14px 28px; border-radius:100px; transition:all .15s ease; }
+  .cat-tab:hover{ color:var(--brand); border-color:var(--lime); }
+  .cat-tab.active{ background:var(--brand); border-color:var(--brand); color:var(--lime); }
+
+  /* Persistent cart indicator, lives in the navbar so "did my Agregar tap register" never
+     requires scrolling past the whole catalog to answer. */
+  .cart-link{ position:relative; flex:0 0 auto; display:flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:50%; background:var(--surface-2); border:1px solid var(--line); color:var(--brand); transition:background .15s ease, border-color .15s ease; }
+  .cart-link:hover{ border-color:var(--lime); background:var(--surface); }
+  .cart-link svg{ width:20px; height:20px; }
+  .cart-count{ position:absolute; top:-4px; right:-4px; min-width:19px; height:19px; padding:0 4px; border-radius:999px; background:var(--lime); color:var(--brand-2); font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; border:2px solid var(--surface); }
+  /* The only feedback an "Agregar" tap gets is this badge, off in the navbar — a brief pulse
+     draws the eye there instead of leaving the click feeling like it did nothing. */
+  .cart-count.bump{ animation:cart-bump .4s ease; }
+  @keyframes cart-bump{ 0%{ transform:scale(1); } 40%{ transform:scale(1.35); } 100%{ transform:scale(1); } }
+  @media (max-width:700px){ .cat-bar-row{ gap:12px; } .cart-link{ width:40px; height:40px; flex-shrink:0; } }
+
+  /* ---------------- Catalog ---------------- */
+  section.block{ padding:80px; }
+  @media (max-width:900px){ section.block{ padding:48px 24px; } }
+  .block-head{ display:flex; flex-direction:column; gap:12px; margin-bottom:48px; }
+  .block-head h2{ font-size:clamp(1.8rem,4vw,2.5rem); letter-spacing:-0.02em; color:var(--brand); }
+  .block-head p{ color:var(--ink-soft); font-size:16px; max-width:70ch; }
+
+  .pgrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  @media (max-width:1100px){ .pgrid{ grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:700px){ .pgrid{ grid-template-columns:1fr 1fr; gap:12px; } }
+
+  /* Under "Todos", 21 cards read as one undifferentiated wall — grouping them under the
+     product's own 7 categories keeps the "Elegí por objetivo" promise instead of dumping
+     everything into a single flat grid. */
+  .cat-group + .cat-group{ margin-top:56px; }
+  .cat-group-head{ font-size:19px; color:var(--brand); margin-bottom:18px; }
+  .pcard{ background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 6px 16px rgba(15,61,51,0.05); }
+  .pcard .thumb{ height:150px; background:var(--surface-2); }
+  .pcard .thumb img{ width:100%; height:100%; object-fit:cover; }
+  .pcard-body{ padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .pcard-title{ font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:15px; line-height:1.25; color:var(--brand); }
+  .pcard-desc{ font-size:12px; line-height:1.4; color:var(--ink-soft); min-height:2.4em; }
+  .pcard-tags{ display:flex; flex-wrap:wrap; gap:5px; }
+  .tag{ font-size:10px; font-weight:600; color:var(--lime-ink); background:var(--surface-2); border-radius:999px; padding:3px 8px; }
+  @media (max-width:700px){ .pcard-body{ padding:10px; gap:8px; } .pcard .thumb{ height:120px; } }
+
+  /* Club CASE: precio general tachado + precio socio, en cada producto */
+  .price-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:8px; padding-top:10px; border-top:1px dashed var(--line); }
+  .price-row .lbl{ display:flex; align-items:center; gap:3px; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); }
+  .price-row .amount{ display:block; font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; margin-top:2px; }
+  .price-general .amount{ font-size:12px; color:var(--ink-soft); text-decoration:line-through; }
+  .price-socio{ text-align:right; }
+  .price-socio .lbl{ justify-content:flex-end; color:var(--lime-ink); }
+  .price-socio .lbl svg{ width:10px; height:10px; }
+  .price-socio .amount{ font-size:16px; font-weight:600; color:var(--brand); }
+  .save-note{ display:block; font-size:10px; color:var(--lime-ink); margin-top:1px; }
+
+  .add-btn{ display:inline-flex; align-items:center; justify-content:center; gap:5px; width:100%; min-height:44px; background:var(--lime); color:var(--brand-2); border:none; cursor:pointer; font-family:"Public Sans",sans-serif; font-weight:700; font-size:12px; padding:9px 12px; border-radius:10px; transition:background .15s ease; }
+  .add-btn:hover{ background:var(--lime-deep); }
+  .add-btn svg{ width:12px; height:12px; }
+
+  /* Miércoles de Club CASE */
+  .wed-banner{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(120deg, var(--brand) 0%, var(--brand-2) 100%);
+    color:#fff; border-radius:16px; padding:16px 22px; margin-bottom:34px; font-size:14px; text-align:center;
+  }
+  .wed-banner svg{ width:18px; height:18px; color:var(--lime); flex-shrink:0; }
+  .wed-banner .code{ font-family:"JetBrains Mono",ui-monospace,monospace; background:rgba(255,255,255,0.14); padding:3px 10px; border-radius:6px; letter-spacing:0.04em; }
+  .wed-banner.is-today{ background:linear-gradient(120deg, var(--lime-deep) 0%, var(--brand) 100%); }
+
+  /* Nudge de socio en el resumen del carrito */
+  .club-nudge{ border-top:1px dashed var(--line); padding-top:20px; display:flex; flex-direction:column; gap:6px; }
+  .club-nudge .head{ display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--lime-ink); }
+  .club-nudge .head svg{ width:13px; height:13px; }
+  .club-nudge .amt{ font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:18px; color:var(--brand); }
+  .club-nudge p{ font-size:13px; color:var(--ink-soft); }
+  .club-nudge a{ color:var(--lime-ink); font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+
+  .divider{ height:1px; background:var(--line); margin:0 80px; }
+  @media (max-width:900px){ .divider{ margin:0 24px; } }
+
+  /* ---------------- Cart ---------------- */
+  .cart-title-row{ display:flex; align-items:center; gap:12px; }
+  .cart-title-row svg{ width:24px; height:24px; color:var(--brand); }
+  .cart-title-row h2{ font-size:32px; letter-spacing:-0.02em; color:var(--brand); }
+  .cart-wrap{ display:flex; gap:32px; align-items:flex-start; }
+  @media (max-width:860px){ .cart-wrap{ flex-direction:column; } }
+  .cart-items{ flex:1; display:flex; flex-direction:column; gap:16px; min-width:0; }
+  .cart-item{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .cart-item .item-meta{ display:flex; align-items:center; gap:16px; }
+  .cart-item .thumb{ width:64px; height:64px; border-radius:12px; overflow:hidden; flex-shrink:0; background:var(--surface-2); }
+  .cart-item .thumb img{ width:100%; height:100%; object-fit:cover; }
+  .cart-item .name{ font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:16px; color:var(--brand); }
+  .cart-item .unit{ font-size:13px; color:var(--ink-soft); margin-top:2px; }
+  .qty-control{ display:flex; align-items:center; gap:16px; }
+  .qty-btn{ width:32px; height:32px; border-radius:8px; background:var(--surface-2); border:1px solid var(--line); cursor:pointer; font-weight:700; font-size:16px; color:var(--brand); display:flex; align-items:center; justify-content:center; transition:background .15s ease; }
+  .qty-btn:hover{ background:var(--line); }
+  .qty-val{ font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; font-size:15px; min-width:14px; text-align:center; }
+  .item-total{ display:flex; align-items:center; gap:32px; font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; font-size:17px; color:var(--brand); }
+  .trash-btn{ background:none; border:none; cursor:pointer; color:var(--ink-soft); display:flex; padding:2px; }
+  .trash-btn:hover{ color:#c0392b; }
+  .trash-btn svg{ width:18px; height:18px; }
+  .cart-empty{ padding:28px; text-align:center; color:var(--ink-soft); background:var(--surface); border:1px dashed var(--line); border-radius:16px; font-size:14px; }
+
+  .cart-summary{ width:400px; max-width:100%; flex-shrink:0; background:var(--surface); border:1px solid var(--line); border-radius:24px; padding:32px; display:flex; flex-direction:column; gap:24px; box-shadow:0 8px 24px rgba(15,61,51,0.06); }
+  .cart-summary h3{ font-size:22px; letter-spacing:-0.01em; color:var(--brand); }
+  .sum-rows{ display:flex; flex-direction:column; gap:16px; }
+  .sum-row{ display:flex; justify-content:space-between; gap:12px; font-size:14px; }
+  .sum-row .lbl{ color:var(--ink-soft); }
+  .sum-row .val{ font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:500; color:var(--ink); }
+  .sum-divider{ border-top:1px dashed var(--line); }
+  .sum-total{ display:flex; justify-content:space-between; align-items:baseline; }
+  .sum-total .lbl{ font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:18px; color:var(--brand); }
+  .sum-total .amt{ font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; font-size:22px; color:var(--brand); }
+  .btn-teal{ background:var(--brand); color:#fff; padding:16px 20px; font-size:16px; box-shadow:0 1px 2px rgba(15,61,51,0.06), 0 8px 24px rgba(15,61,51,0.14); }
+  .btn-teal:hover{ background:var(--brand-2); }
+
+  /* ---------------- Checkout ---------------- */
+  /* What's being paid for was completely off-screen once a visitor scrolled into checkout —
+     this keeps a compact reminder in view without repeating the full cart. */
+  .checkout-mini-summary{ display:flex; justify-content:space-between; align-items:baseline; background:var(--surface-2); border-radius:16px; padding:16px 24px; margin-bottom:24px; font-size:14px; color:var(--ink-soft); }
+  .checkout-mini-summary .amt{ font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600; font-size:18px; color:var(--brand); }
+  .checkout-grid{ display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start; }
+  @media (max-width:860px){ .checkout-grid{ grid-template-columns:1fr; } }
+  .panel{ background:var(--surface); border:1px solid var(--line); border-radius:24px; padding:32px; display:flex; flex-direction:column; gap:24px; }
+  .panel h3{ font-size:20px; color:var(--brand); }
+
+  .field{ display:flex; flex-direction:column; gap:8px; }
+  .field label{ font-size:13px; font-weight:600; color:var(--brand); }
+  .field label .opt{ font-weight:400; color:var(--ink-soft); }
+  .legal-note{ display:flex; gap:10px; align-items:flex-start; font-size:12px; line-height:1.5; color:var(--ink-soft); background:var(--surface-2); border-radius:12px; padding:14px; }
+  .legal-note svg{ width:15px; height:15px; color:var(--lime-ink); flex-shrink:0; margin-top:1px; }
+  .field input{ width:100%; padding:14px; border-radius:12px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); font-size:14px; font-family:inherit; }
+  .field input::placeholder{ color:var(--ink-soft); }
+  .field input:focus{ border-color:var(--brand); box-shadow:0 0 0 3px color-mix(in srgb, var(--lime) 30%, transparent); }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .fields{ display:flex; flex-direction:column; gap:16px; }
+
+  /* Inline validation replaces native browser bubbles, which would look inconsistent with
+     the rest of this bespoke input design. */
+  .field.has-error input{ border-color:#c0392b; background:color-mix(in srgb, #c0392b 6%, var(--surface-2)); }
+  .field.has-error input:focus{ box-shadow:0 0 0 3px color-mix(in srgb, #c0392b 25%, transparent); }
+  .field-error-msg{ font-size:12px; color:#c0392b; }
+
+  .pay-tabs{ display:flex; flex-wrap:wrap; gap:8px; }
+  .pay-tab{ flex:1 1 calc(50% - 4px); display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 8px; border-radius:12px; border:1px solid var(--line); background:var(--surface-2); cursor:pointer; font-family:"Public Sans",sans-serif; font-size:11px; font-weight:600; color:var(--ink); text-align:center; transition:all .15s ease; }
+  @media (min-width:520px){ #payTabs.pay-tabs .pay-tab{ flex:1; } }
+  .pay-tab svg{ width:20px; height:20px; }
+  .pay-tab:hover{ border-color:var(--lime); }
+  .pay-tab.active{ background:var(--lime); border-color:var(--lime); color:var(--brand-2); }
+  .cash-note{ font-size:13px; color:var(--ink-soft); background:var(--surface-2); border-radius:12px; padding:14px; }
+
+  /* ---------------- Success ---------------- */
+  .success-panel{ text-align:center; padding:34px 10px; }
+  .check-circle{ width:64px; height:64px; margin:0 auto 18px; border-radius:50%; background:var(--surface-2); display:flex; align-items:center; justify-content:center; }
+  .check-circle svg{ width:30px; height:30px; stroke:var(--lime-ink); }
+  .check-circle path{ stroke-dasharray:30; stroke-dashoffset:30; animation:draw-check .5s ease forwards .15s; }
+  @keyframes draw-check{ to{ stroke-dashoffset:0; } }
+  .success-panel h3{ margin-bottom:8px; font-size:20px; color:var(--brand); }
+  .success-panel p{ color:var(--ink-soft); font-size:14px; }
+  .success-panel .code-pill{ display:inline-block; margin-top:14px; font-family:"JetBrains Mono",ui-monospace,monospace; letter-spacing:0.04em; font-size:14px; background:var(--surface-2); border:1px solid var(--line); padding:8px 16px; border-radius:999px; color:var(--brand); }
+  /* Reuses the cart summary's own row/divider/total language so the receipt reads as a
+     continuation of what the visitor already saw, not a downgrade after paying. */
+  .order-recap{ text-align:left; max-width:360px; margin:24px auto 0; display:flex; flex-direction:column; gap:14px; }
+  .success-panel .btn{ display:inline-flex; margin-top:24px; padding:14px 26px; }
+  .btn-ghost{ background:transparent; color:var(--brand); border:2px solid var(--line); }
+  .btn-ghost:hover{ background:var(--surface-2); border-color:var(--brand); }
+
+  /* ---------------- Footer ---------------- */
+  footer{ background:var(--brand); color:#fff; padding:56px 64px 32px; display:flex; flex-direction:column; gap:40px; }
+  @media (max-width:900px){ footer{ padding:48px 24px 32px; } }
+  .footer-content{ display:flex; justify-content:space-between; gap:32px; flex-wrap:wrap; }
+  .footer-brand{ width:360px; max-width:100%; display:flex; flex-direction:column; gap:16px; }
+  .footer-brand .logo-img{ height:112px; }
+  .footer-brand p{ font-size:14px; color:rgba(247,248,242,0.75); line-height:1.55; max-width:34ch; }
+  .footer-col{ width:200px; display:flex; flex-direction:column; gap:12px; }
+  .footer-col h4{ font-family:"Public Sans",sans-serif; font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--lime); }
+  .footer-col a, .footer-col p{ font-size:14px; color:rgba(247,248,242,0.75); }
+  .footer-col a:hover{ color:var(--lime); }
+  .footer-social{ display:flex; gap:16px; }
+  .footer-social a{ width:40px; height:40px; border-radius:100px; background:rgba(255,255,255,0.13); display:flex; align-items:center; justify-content:center; transition:background .15s ease; }
+  .footer-social a:hover{ background:var(--lime-deep); }
+  .footer-social svg{ width:18px; height:18px; }
+  .footer-line{ height:1px; background:rgba(255,255,255,0.14); }
+  .footer-bottom{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:13px; color:rgba(247,248,242,0.6); }
+  .footer-legal{ display:flex; gap:24px; }
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <defs>
+    <symbol id="i-cart" viewBox="0 0 24 24"><path d="M4 4h2l1.6 10.6a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L21 8H6.5"/><circle cx="9.5" cy="20" r="1.3" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.3" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"/><path d="M6 7l1 13.5A1.5 1.5 0 0 0 8.5 22h7a1.5 1.5 0 0 0 1.5-1.5L18 7"/><path d="M10 11v7M14 11v7"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9v.01M18 15v.01"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.2"/><path d="M2.5 10h19"/><path d="M6 15h5"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h11A2.5 2.5 0 0 1 19 7.5V8H5.5A2.5 2.5 0 0 1 3 5.5"/><path d="M3 7.5v9A2.5 2.5 0 0 0 5.5 19h13a1 1 0 0 0 1-1v-3.5"/><path d="M15.5 13.2a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.4 5 5.5.6-4.1 3.8 1.1 5.4-4.9-2.8-4.9 2.8 1.1-5.4L4 9.1l5.5-.6 2.5-5z"/></symbol>
+    <symbol id="i-coupon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M9 6v12" stroke-dasharray="1.6 2.4"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5l7 2.7v5.3c0 4.8-3 8-7 9.5-4-1.5-7-4.7-7-9.5V6.2z"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M3.5 7.5L12 3l8.5 4.5L12 12 3.5 7.5z"/><path d="M3.5 7.5V16L12 20.5m0-8.5v8.5m8.5-13V16L12 20.5"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-7.5 7-12.5A7 7 0 0 0 5 8.5C5 13.5 12 21 12 21z"/><circle cx="12" cy="8.5" r="2.4"/></symbol>
+    <symbol id="i-mp" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M9.2 11.5l1.8 1.8 3.8-3.8"/><circle cx="12" cy="19" r="0.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="0.8" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-fb" viewBox="0 0 24 24"><path d="M14 21v-7h2.4l.4-3H14V9c0-.9.3-1.6 1.7-1.6H17V4.7c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1V11H8v3h2.6v7z" fill="currentColor" stroke="none"/></symbol>
+  </defs>
+</svg>
+
+<main>
+
+  <section class="hero" id="top">
+    <div class="hero-overlay">
+      <div class="hero-logo-wrap">
+        <img class="hero-logo-fallback" id="heroLogoFallback" src="assets/img/logo-case-outline.png" alt="CASE">
+        <canvas class="hero-logo" id="heroLogoCanvas" role="img" aria-label="CASE"></canvas>
+      </div>
+      <h1 class="hero-reveal" id="heroReveal" data-anim-high="right, lime"><strong>Comida real</strong>, sin vueltas. Elegí por lo que <strong>necesitás</strong>, no por lo que promete la <strong>etiqueta</strong>.</h1>
+      <div class="hero-ctas">
+        <a href="#catalogo" class="btn btn-lime">Ver el catálogo</a>
+        <a href="sitio-case.html#club" class="btn btn-outline">Sumate al Club CASE</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="catBarSentinel"></div>
+  <div class="cat-bar" id="catBar">
+    <div class="cat-bar-row">
+      <div class="cat-tabs" id="catFilters">
+        <button class="cat-tab active" data-cat="all">Todos</button>
+        <button class="cat-tab" data-cat="proteinas">Proteínas</button>
+        <button class="cat-tab" data-cat="snacks">Snacks Fit</button>
+        <button class="cat-tab" data-cat="panificados">Panificados Dietéticos</button>
+        <button class="cat-tab" data-cat="dietas">Dietas Especiales</button>
+        <button class="cat-tab" data-cat="bebidas">Bebidas</button>
+        <button class="cat-tab" data-cat="packs">Packs</button>
+        <button class="cat-tab" data-cat="merch">Merchandising</button>
+      </div>
+      <a href="#carrito" class="cart-link" id="cartLink" aria-label="Ver carrito, 0 productos">
+        <svg class="ic" viewBox="0 0 24 24"><use href="#i-cart"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </a>
+    </div>
+  </div>
+
+  <section class="block" id="catalogo">
+    <div class="block-head">
+      <h2>Elegí por objetivo</h2>
+      <p>Todo lo que tenemos en el local, con los ingredientes y el precio a la vista. Sin letra chica.</p>
+    </div>
+    <div class="wed-banner" id="wedBanner">
+      <svg class="ic" viewBox="0 0 24 24"><use href="#i-coupon"/></svg>
+      <span id="wedBannerText">Todos los miércoles, 5% OFF extra para socios con el código</span>
+      <span class="code">CASE-MIE</span>
+    </div>
+    <div id="productGrid"></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="block" id="carrito">
+    <div class="block-head" style="margin-bottom:32px;">
+      <div class="cart-title-row"><svg class="ic" viewBox="0 0 24 24"><use href="#i-cart"/></svg><h2>Tu Carrito</h2></div>
+      <p>Mirá que esté todo bien antes de pasar al pago.</p>
+    </div>
+    <div class="cart-wrap">
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-summary">
+        <h3>Resumen de Compra</h3>
+        <div class="sum-rows">
+          <div class="sum-row"><span class="lbl">Subtotal</span><span class="val" id="sumSubtotal">$0</span></div>
+          <div class="sum-row"><span class="lbl" id="sumShippingLabel">Envío express</span><span class="val" id="sumShipping">$1.000</span></div>
+        </div>
+        <div class="sum-divider"></div>
+        <div class="sum-total"><span class="lbl">Total estimado</span><span class="amt" id="sumTotal">$0</span></div>
+        <div class="club-nudge" id="clubNudge"></div>
+        <a href="#checkout" class="btn btn-teal btn-block">Ir al pago</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="block" id="checkout">
+    <div class="block-head" style="margin-bottom:32px;">
+      <h2>Finalizar Pedido</h2>
+      <p>Dejanos dónde llevártelo y cómo preferís pagar.</p>
+    </div>
+
+    <form id="checkoutForm" novalidate>
+      <div class="checkout-mini-summary" id="checkoutMiniSummary">
+        <span id="miniSummaryCount">0 productos</span>
+        <span class="amt" id="miniSummaryTotal">$0</span>
+      </div>
+      <div class="checkout-grid" id="checkoutGrid">
+        <div class="panel">
+          <h3>Datos de Entrega</h3>
+          <div class="pay-tabs" id="fulfillTabs" role="group" aria-label="Forma de entrega">
+            <button type="button" class="pay-tab active" aria-pressed="true" data-fulfill="delivery"><svg class="ic" viewBox="0 0 24 24"><use href="#i-box"/></svg>Envío a domicilio</button>
+            <button type="button" class="pay-tab" aria-pressed="false" data-fulfill="pickup"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Retiro en el local</button>
+          </div>
+          <div class="fields">
+            <div class="field"><label for="ckNombre">Nombre Completo</label><input id="ckNombre" required autocomplete="name" placeholder="Tomás González"></div>
+            <div class="field" id="direccionField"><label for="ckDireccion">Dirección de Envío</label><input id="ckDireccion" required autocomplete="street-address" placeholder="San Jerónimo 3040, Santa Fe"></div>
+            <div class="field">
+              <label for="ckDni">DNI <span class="opt">— opcional, solo para el precio Socio, sin puntos</span></label>
+              <input id="ckDni" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="30123456">
+            </div>
+          </div>
+          <p class="cash-note" id="pickupNote" hidden>Retirás en San Martín 2130, Santa Fe, con tu código de pedido. Sin cargo de envío.</p>
+          <p class="legal-note">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg>
+            <span>Pedimos el DNI únicamente para validar tu precio Socio y el cupón de los miércoles. Uso interno, con baja cuando quieras, conforme a la Ley 25.326 de Protección de Datos Personales.</span>
+          </p>
+        </div>
+
+        <div class="panel">
+          <h3>Método de Pago</h3>
+          <div class="pay-tabs" id="payTabs" role="group" aria-label="Método de pago">
+            <button type="button" class="pay-tab" aria-pressed="false" data-pay="efectivo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-cash"/></svg>Efectivo</button>
+            <button type="button" class="pay-tab" aria-pressed="false" data-pay="mercadopago"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mp"/></svg>Mercado Pago</button>
+            <button type="button" class="pay-tab active" aria-pressed="true" data-pay="credito"><svg class="ic" viewBox="0 0 24 24"><use href="#i-card"/></svg>Tarjeta de Crédito</button>
+            <button type="button" class="pay-tab" aria-pressed="false" data-pay="debito"><svg class="ic" viewBox="0 0 24 24"><use href="#i-wallet"/></svg>Tarjeta de Débito</button>
+          </div>
+
+          <div class="fields" id="cardFields">
+            <div class="field"><label for="ckCardNum">Número de Tarjeta</label><input id="ckCardNum" inputmode="numeric" maxlength="19" autocomplete="cc-number" placeholder="4512 8831 0922 4756"></div>
+            <div class="field-row">
+              <div class="field"><label for="ckVenc">Vencimiento</label><input id="ckVenc" maxlength="5" autocomplete="cc-exp" placeholder="08/29"></div>
+              <div class="field"><label for="ckCvv">CVV</label><input id="ckCvv" inputmode="numeric" maxlength="4" autocomplete="cc-csc" placeholder="***"></div>
+            </div>
+          </div>
+          <p class="legal-note" id="cardNote">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg>
+            <span>Pago encriptado. No guardamos el número completo de tu tarjeta.</span>
+          </p>
+          <p class="cash-note" id="cashNote" hidden>Pagás en efectivo al recibir tu pedido, o en el local retirando con tu código de orden.</p>
+          <p class="cash-note" id="mpNote" hidden>Te mandamos el link de pago de Mercado Pago junto con la confirmación del pedido.</p>
+
+          <button type="submit" class="btn btn-teal btn-block" id="confirmBtn">Confirmar pedido</button>
+        </div>
+      </div>
+
+      <div class="panel success-panel" id="successPanel" hidden>
+        <div class="check-circle"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+        <h3>¡Pedido confirmado!</h3>
+        <p>Te mandamos el detalle por mail. Cualquier cosa, escribinos.</p>
+        <span class="code-pill" id="orderCode">CASE-00000</span>
+        <div class="order-recap" id="orderRecap"></div>
+        <div><a href="#catalogo" class="btn btn-ghost">Seguir comprando</a></div>
+      </div>
+    </form>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-brand">
+      <a href="#top" class="logo"><img src="assets/img/logo-case-outline.png" alt="CASE" class="logo-img"><span class="dot"></span></a>
+      <p>Dietética de barrio en Santa Fe. Comida real, del local a tu casa.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <p>San Martín 2130, Santa Fe</p>
+      <p>contacto@case.com.ar</p>
+    </div>
+    <div class="footer-col">
+      <h4>Seguinos</h4>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram"><svg class="ic" viewBox="0 0 24 24" style="color:#fff"><use href="#i-insta"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg class="ic" viewBox="0 0 24 24" style="color:#fff"><use href="#i-fb"/></svg></a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-line"></div>
+  <div class="footer-bottom">
+    <span>© 2026 CASE. Todos los derechos reservados.</span>
+    <div class="footer-legal">
+      <a href="#">Términos de Servicio</a>
+      <a href="#">Política de Privacidad</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Smooth (inertia) scroll for the whole page — off entirely when the visitor asks for less motion.
+  const lenis = new Lenis({
+    duration: 1.15,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: !prefersReducedMotion,
+    smoothTouch: false,
+  });
+
+  // Drive Lenis off GSAP's own ticker instead of a second requestAnimationFrame loop.
+  gsap.ticker.add((time) => lenis.raf(time * 1000));
+  gsap.ticker.lagSmoothing(0);
+
+  // Route in-page anchor links (nav, "Ir al checkout", footer) through Lenis so they animate too.
+  // Any target below the sticky cat-bar needs a matching negative offset, or the bar renders
+  // on top of the destination's own heading right as a visitor commits to checkout.
+  document.querySelectorAll('a[href^="#"]').forEach((a) => {
+    const id = a.getAttribute('href').slice(1);
+    if (!id) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      // catBar itself is position:sticky, so its own offsetTop tracks the current scroll
+      // position once stuck rather than staying fixed — compare against its sentinel (a
+      // plain, non-sticky marker at the bar's original document position) instead.
+      const catBar = document.getElementById('catBar');
+      const sentinel = document.getElementById('catBarSentinel');
+      const offset = catBar && sentinel && target.offsetTop > sentinel.offsetTop ? -catBar.offsetHeight : 0;
+      lenis.scrollTo(target, { offset, immediate: prefersReducedMotion });
+    });
+  });
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+<script>
+  // 3D "case" wordmark (case-chrome.obj/.mtl): sits at a fixed base angle (that's what gives
+  // it the embossed "balloon" relief), then tilts gently toward the cursor — like a glass
+  // card catching light — instead of any free-running motion. Desktop only; with no pointer,
+  // it just stays at its base angle.
+  (function(){
+    const canvas = document.getElementById('heroLogoCanvas');
+    if (!canvas || !window.THREE) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+    camera.position.set(0, 0, 6);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    keyLight.position.set(4, 5, 6);
+    scene.add(keyLight);
+    const rimLight = new THREE.DirectionalLight(0x8fcb3c, 0.7);
+    rimLight.position.set(-5, -2, -4);
+    scene.add(rimLight);
+
+    let model = null, modelSize = null;
+    // Generous margin — a slightly-too-early canvas measurement (before layout/fonts settle)
+    // should read as "a bit more empty space around it", never as a cropped letter.
+    const FILL_PADDING = 1.4;
+    const BASE_ROT = { x: -0.08, y: 0.22 };
+
+    function fitCameraToModel(){
+      if (!modelSize) return;
+      const fovRad = camera.fov * Math.PI / 180;
+      const distForHeight = (modelSize.y / 2) / Math.tan(fovRad / 2);
+      const distForWidth  = (modelSize.x / 2) / (Math.tan(fovRad / 2) * camera.aspect);
+      camera.position.z = Math.max(distForHeight, distForWidth) * FILL_PADDING;
+    }
+
+    function sizeToElement(){
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      fitCameraToModel();
+      render();
+    }
+
+    function render(){ renderer.render(scene, camera); }
+
+    new THREE.MTLLoader().load('case-chrome.mtl', (materials) => {
+      materials.preload();
+      const objLoader = new THREE.OBJLoader();
+      objLoader.setMaterials(materials);
+      objLoader.load('case-chrome.obj', (obj) => {
+        // The .obj has no per-face usemtl assignments, so apply the lime material to every mesh.
+        const limeMat = materials.materials.verde_lima;
+        obj.traverse((child) => { if (child.isMesh) child.material = limeMat; });
+
+        const bbox = new THREE.Box3().setFromObject(obj);
+        const size = bbox.getSize(new THREE.Vector3());
+        const center = bbox.getCenter(new THREE.Vector3());
+        obj.position.sub(center);
+        obj.rotation.set(BASE_ROT.x, BASE_ROT.y, 0);
+
+        model = obj;
+        modelSize = size;
+        scene.add(obj);
+        sizeToElement();
+        const fallback = document.getElementById('heroLogoFallback');
+        if (fallback) fallback.classList.add('is-hidden');
+        // Belt-and-suspenders re-measure: if the very first read landed mid-layout (before
+        // web fonts or a late reflow settled the canvas's real size), these correct it.
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizeToElement);
+        window.addEventListener('load', sizeToElement);
+        setTimeout(sizeToElement, 300);
+        setTimeout(sizeToElement, 1000);
+      }, undefined, (err) => console.error('OBJLoader error', err));
+    }, undefined, (err) => console.error('MTLLoader error', err));
+
+    window.addEventListener('resize', sizeToElement);
+    new ResizeObserver(sizeToElement).observe(canvas);
+
+    // Cursor tilt: target angle tracks the pointer, current angle eases toward it each frame
+    // (a lerp, not a spring) so it reads as smooth glass-card tracking, never jittery.
+    if (prefersReducedMotion) return;
+    const TILT_RANGE = 0.22; // radians of extra tilt at the pointer's furthest reach
+    let targetX = 0, targetY = 0;
+
+    window.addEventListener('pointermove', (e) => {
+      const r = canvas.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const nx = Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth / 2)));
+      const ny = Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight / 2)));
+      targetY = nx * TILT_RANGE;
+      targetX = ny * TILT_RANGE;
+    });
+    window.addEventListener('pointerleave', () => { targetX = 0; targetY = 0; });
+
+    function tick(){
+      requestAnimationFrame(tick);
+      if (!model) return;
+      model.rotation.x += (BASE_ROT.x + targetX - model.rotation.x) * 0.08;
+      model.rotation.y += (BASE_ROT.y + targetY - model.rotation.y) * 0.08;
+      render();
+    }
+    requestAnimationFrame(tick);
+  })();
+</script>
+
+<script>
+  // Line-by-line clip-path reveal with a color "wipe" sweep, ported from landonorris.com's
+  // data-anim-high technique (reverse-engineered from their JS bundle) — swapped to CASE's tokens/fonts.
+  function initHeroReveal(el){
+    if (!window.gsap || !window.SplitText) return;
+    gsap.registerPlugin(SplitText);
+    const direction = (el.dataset.animHigh || 'right').split(',')[0].trim();
+    const split = SplitText.create(el, { type: 'lines', linesClass: 'line' });
+    const tl = gsap.timeline({ paused:true });
+
+    split.lines.forEach((line, i) => {
+      const fromClip = direction === 'right' ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)';
+      const toClip   = direction === 'right' ? 'inset(0 0% 0 0)'   : 'inset(0 0 0 0%)';
+      gsap.set(line, { clipPath: fromClip, autoAlpha: 1 });
+
+      const wipe = document.createElement('div');
+      wipe.className = 'reveal-wipe';
+      wipe.style.transformOrigin = direction === 'right' ? 'right center' : 'left center';
+      line.appendChild(wipe);
+
+      const start = i * 0.15;
+      tl.to(line, { clipPath: toClip, duration:0.6, ease:'power2.out' }, start);
+      tl.to(wipe, { scaleX:0, duration:0.6, ease:'power2.inOut' }, start + 0.3);
+    });
+    return tl;
+  }
+
+  document.fonts.ready.then(() => {
+    const el = document.getElementById('heroReveal');
+    if (!el) return;
+    // Reduced motion: the headline is already at its final state, so there is nothing to reveal.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const tl = initHeroReveal(el);
+    if (!tl) return;
+    requestAnimationFrame(() => tl.play());
+    // Red de seguridad: el texto arranca clippeado, así que si los frames no corren
+    // (pestaña en segundo plano, rAF pausado) el titular quedaría invisible. Lo forzamos al final.
+    setTimeout(() => { if (tl.progress() < 1) tl.progress(1); }, 4000);
+  });
+</script>
+
+<script>
+  // Catálogo con las 7 categorías del producto: proteínas, snacks fit, panificados,
+  // dietas especiales, bebidas, packs y merchandising.
+  const PRODUCTS = [
+    { id:'batido',    cat:'proteinas',   name:'Batido proteico vainilla 400g',        desc:'Proteína de suero sabor vainilla, envase de 400g.',                        price:6800,  tags:['proteina','sin-tacc'], img:'protein-shake.jpg',            alt:'Batido proteico sabor vainilla servido en vaso, junto al envase de 400g' },
+    { id:'milanesa',  cat:'proteinas',   name:'Milanesa de soja x6 unidades',         desc:'Seis milanesas de soja, listas para horno o sartén.',                      price:4100,  tags:['vegano'],              img:'soy-milanesa.jpg',             alt:'Milanesas de soja doradas y crocantes servidas en plato' },
+    { id:'wrap',      cat:'proteinas',   name:'Wrap Proteico',                        desc:'Pechuga de pollo grillada, palta fresca, espinaca y aderezo fit.',         price:3200,  tags:['proteina'],            img:'case-v2/wrap-proteico.png',    alt:'Wrap de pollo cortado al medio, con palta y espinaca a la vista' },
+
+    { id:'barra',     cat:'snacks',      name:'Barra proteica cacao',                 desc:'Barra de cacao con proteína, de textura densa.',                           price:2200,  tags:['proteina'],            img:'protein-bar.jpg',              alt:'Barra proteica de cacao cortada, mostrando su textura densa' },
+    { id:'bolitas',   cat:'snacks',      name:'Bolitas energéticas dátil y almendra', desc:'Bolitas de dátil y almendra, envase de 150g.',                             price:2600,  tags:['vegano','sin-tacc'],   img:'energy-balls.jpg',             alt:'Bolitas energéticas de dátil y almendra apiladas' },
+    { id:'acai',      cat:'snacks',      name:'Bowl de Açaí',                         desc:'Açaí puro con granola artesanal, banana y coco rallado.',                  price:4500,  tags:['vegano','sin-tacc'],   img:'case-v2/acai-bowl.png',        alt:'Bowl de açaí con frutillas, arándanos, banana y granola' },
+    { id:'granola',   cat:'snacks',      name:'Granola Fit',                          desc:'Avena tostada con miel, almendras, nueces y semillas de chía.',            price:2100,  tags:['vegano'],              img:'case-v2/granola-fit.png',      alt:'Granola casera servida en bowl de cerámica, con almendras a la vista' },
+    { id:'barrita',   cat:'snacks',      name:'Barrita Energética',                   desc:'Dátiles, cacao amargo, maní y proteína de suero.',                         price:1500,  tags:['proteina','sin-tacc'], img:'case-v2/barrita-energetica.png', alt:'Barra de dátil y cacao con almendras enteras, cortada en rodajas' },
+
+    { id:'pan',       cat:'panificados', name:'Pan sin TACC x500g',                   desc:'Pan de molde sin TACC, horma de 500g.',                                    price:3500,  tags:['sin-tacc'],            img:'gluten-free-bread.jpg',        alt:'Pan sin TACC recién horneado, cortado en rebanadas' },
+    { id:'budin',     cat:'panificados', name:'Budín integral de banana x400g',       desc:'Budín integral de banana, de miga húmeda.',                                price:3200,  tags:['vegano'],              img:'banana-bread.jpg',             alt:'Budín integral de banana cortado, mostrando su miga húmeda' },
+
+    { id:'keto',      cat:'dietas',      name:'Bowl keto pollo',                      desc:'Pollo con vegetales salteados, bajo en carbohidratos.',                    price:4800,  tags:['keto','sin-tacc'],     img:'keto-bowl.jpg',                alt:'Bowl keto de pollo con vegetales salteados' },
+    { id:'diabetico', cat:'dietas',      name:'Menú apto diabéticos x3 días',         desc:'Tres días de viandas en contenedores, aptas para diabéticos.',             price:11500, tags:['diabeticos'],          img:'diabetic-menu.jpg',            alt:'Viandas semanales apto diabéticos ordenadas en contenedores' },
+
+    { id:'agua',      cat:'bebidas',     name:'Agua saborizada sin azúcar x500ml',    desc:'Agua saborizada con frutas, sin azúcar, 500ml.',                           price:1200,  tags:['vegano'],              img:'flavored-water.jpg',           alt:'Botella de agua saborizada con frutas frescas' },
+    { id:'te',        cat:'bebidas',     name:'Té helado jengibre y limón x500ml',    desc:'Té helado funcional de jengibre y limón, 500ml.',                          price:1600,  tags:['vegano'],              img:'iced-tea.jpg',                 alt:'Vaso de té helado con jengibre y rodajas de limón' },
+    { id:'smoothie',  cat:'bebidas',     name:'Smoothie Verde',                       desc:'Espinaca, manzana verde, pepino, jengibre y limón.',                       price:2800,  tags:['vegano','diabeticos'], img:'case-v2/smoothie-verde.png',   alt:'Smoothie verde en frasco de vidrio, con hojas de menta' },
+
+    { id:'packfit',   cat:'packs',       name:'Pack semanal fit (5 viandas)',         desc:'Cinco viandas para toda la semana, listas para retirar.',                  price:18900, tags:['proteina'],            img:'weekly-pack.jpg',              alt:'Cinco viandas semanales fit apiladas, listas para retirar' },
+    { id:'packmer',   cat:'packs',       name:'Pack merienda saludable',              desc:'Un snack más una bebida, para la merienda.',                               price:3400,  tags:['vegano'],              img:'snack-pack.jpg',               alt:'Pack de merienda saludable con snack y bebida' },
+    { id:'mealprep',  cat:'packs',       name:'Meal Prep Semanal',                    desc:'Cinco comidas balanceadas listas para calentar y consumir.',               price:12900, tags:['proteina','keto'],     img:'case-v2/meal-prep-semanal.png',alt:'Cinco viandas de meal prep en contenedores, con pollo y vegetales' },
+
+    { id:'remera',    cat:'merch',       name:'Remera algodón orgánico',              desc:'Algodón orgánico, con la estampa "Comida real".',                          price:9500,  tags:[],                      img:'tshirt.jpg',                   alt:'Remera de algodón orgánico doblada, con estampa Comida real' },
+    { id:'gorra',     cat:'merch',       name:'Gorra trucker CASE',                   desc:'Gorra trucker en verde lima.',                                             price:7200,  tags:[],                      img:'cap.jpg',                      alt:'Gorra trucker verde y blanca sobre fondo oscuro' },
+    { id:'botella',   cat:'merch',       name:'Botella térmica 500ml',                desc:'Botella térmica de 500ml.',                                                price:12800, tags:[],                      img:'thermal-bottle.jpg',           alt:'Botella térmica metálica de 500ml con logo CASE' },
+  ];
+  const TAG_LABELS = {
+    proteina:   'Alto en proteína',
+    vegano:     'Vegano',
+    'sin-tacc': 'Sin TACC',
+    keto:       'Keto',
+    diabeticos: 'Apto diabéticos',
+  };
+  // Same 7 categories and labels as the filter tabs, same order — the "Todos" view groups by
+  // them instead of repeating the taxonomy only as tab text nobody sees again once selected.
+  const CAT_LABELS = {
+    proteinas:   'Proteínas',
+    snacks:      'Snacks Fit',
+    panificados: 'Panificados Dietéticos',
+    dietas:      'Dietas Especiales',
+    bebidas:     'Bebidas',
+    packs:       'Packs',
+    merch:       'Merchandising',
+  };
+  const CAT_ORDER = Object.keys(CAT_LABELS);
+  const CART_THUMBS = { acai:'case-v2/cart-thumb-acai.png', wrap:'case-v2/cart-thumb-wrap.png' };
+  const IMG_BASE = 'assets/img/';
+  const SHIPPING = 1000;
+  // Club CASE: precio cuidado permanente para socios (≈6% bajo el precio general).
+  const SOCIO_RATE = 0.06;
+  const socioPrice = n => Math.round((n * (1 - SOCIO_RATE)) / 10) * 10;
+  const money = n => '$' + n.toLocaleString('es-AR');
+  const isWednesday = () => new Date().getDay() === 3;
+  // Same rule used to accept a DNI at submit and to decide whether this order actually gets
+  // charged Socio pricing — one definition so "valid enough to submit" and "valid enough for
+  // the discount" can never quietly drift apart.
+  const isValidDni = value => /^[0-9]{7,8}$/.test(value.trim());
+
+  const cart = { acai:1, wrap:2 };
+
+  function productCardHTML(p){
+    const socio = socioPrice(p.price);
+    const ahorro = p.price - socio;
+    return `
+      <div class="pcard">
+        <div class="thumb"><img src="${IMG_BASE}${p.img}" alt="${p.alt}"></div>
+        <div class="pcard-body">
+          <div class="pcard-title">${p.name}</div>
+          <div class="pcard-desc">${p.desc}</div>
+          ${p.tags.length ? `<div class="pcard-tags">${p.tags.map(t => `<span class="tag">${TAG_LABELS[t]}</span>`).join('')}</div>` : ''}
+          <div class="price-row">
+            <div class="price-general">
+              <span class="lbl">General</span>
+              <span class="amount">${money(p.price)}</span>
+            </div>
+            <div class="price-socio">
+              <span class="lbl"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg>Socio</span>
+              <span class="amount">${money(socio)}</span>
+              <span class="save-note">Ahorrás ${money(ahorro)}</span>
+            </div>
+          </div>
+          <button class="add-btn" data-add="${p.id}"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Agregar</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderProducts(filter){
+    const grid = document.getElementById('productGrid');
+
+    if (filter === 'all') {
+      // "Elegí por objetivo" only holds if the default view still reads by category —
+      // one flat 21-card grid was the wall the critique flagged.
+      const groups = CAT_ORDER.map(cat => ({ cat, items: PRODUCTS.filter(p => p.cat === cat) })).filter(g => g.items.length);
+      grid.innerHTML = groups.map(g => `
+        <div class="cat-group">
+          <h3 class="cat-group-head">${CAT_LABELS[g.cat]}</h3>
+          <div class="pgrid">${g.items.map(productCardHTML).join('')}</div>
+        </div>
+      `).join('');
+    } else {
+      const items = PRODUCTS.filter(p => p.cat === filter);
+      grid.innerHTML = items.length
+        ? `<div class="pgrid">${items.map(productCardHTML).join('')}</div>`
+        : '<p style="color:var(--ink-soft);">Todavía no hay productos en esta categoría.</p>';
+    }
+
+    grid.querySelectorAll('[data-add]').forEach(btn => {
+      btn.addEventListener('click', () => addToCart(btn.dataset.add));
+    });
+  }
+
+  function clearCart(){ Object.keys(cart).forEach(id => delete cart[id]); renderCart(); }
+
+  // A new "Agregar" after an order confirmed means the visitor is starting another order —
+  // reopen the checkout form instead of leaving the previous success screen stuck on top of it.
+  function resetCheckoutFlow(){
+    const successPanel = document.getElementById('successPanel');
+    if (successPanel.hidden) return;
+    document.getElementById('checkoutGrid').hidden = false;
+    successPanel.hidden = true;
+    const form = document.getElementById('checkoutForm');
+    form.reset();
+    document.querySelectorAll('#payTabs .pay-tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+    const creditoTab = document.querySelector('#payTabs .pay-tab[data-pay="credito"]');
+    creditoTab.classList.add('active');
+    creditoTab.setAttribute('aria-pressed', 'true');
+    document.getElementById('cardFields').hidden = false;
+    document.getElementById('cardNote').hidden = false;
+    document.getElementById('cashNote').hidden = true;
+    document.getElementById('mpNote').hidden = true;
+    document.getElementById('ckCardNum').required = true;
+    document.querySelectorAll('#fulfillTabs .pay-tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+    const deliveryTab = document.querySelector('#fulfillTabs .pay-tab[data-fulfill="delivery"]');
+    deliveryTab.classList.add('active');
+    deliveryTab.setAttribute('aria-pressed', 'true');
+    document.getElementById('direccionField').hidden = false;
+    document.getElementById('ckDireccion').required = true;
+    document.getElementById('pickupNote').hidden = true;
+    document.querySelectorAll('.field.has-error').forEach(f => {
+      f.classList.remove('has-error');
+      const msg = f.querySelector('.field-error-msg');
+      if (msg) msg.remove();
+    });
+  }
+
+  function addToCart(id){
+    resetCheckoutFlow();
+    cart[id] = (cart[id] || 0) + 1;
+    renderCart();
+    const badge = document.getElementById('cartCount');
+    if (badge) {
+      badge.classList.remove('bump');
+      // Force a reflow so retriggering the class on a rapid second "Agregar" restarts the
+      // animation instead of being a no-op because the class never actually left.
+      void badge.offsetWidth;
+      badge.classList.add('bump');
+    }
+  }
+  function changeQty(id, delta){ if (!cart[id]) return; cart[id] += delta; if (cart[id] <= 0) delete cart[id]; renderCart(); }
+  function removeFromCart(id){ delete cart[id]; renderCart(); }
+
+  function renderCart(){
+    const wrap = document.getElementById('cartItems');
+    const ids = Object.keys(cart);
+    const count = ids.reduce((sum, id) => sum + cart[id], 0);
+    const cartCountEl = document.getElementById('cartCount');
+    if (cartCountEl) cartCountEl.textContent = count;
+    const cartLinkEl = document.getElementById('cartLink');
+    if (cartLinkEl) cartLinkEl.setAttribute('aria-label', `Ver carrito, ${count} producto${count === 1 ? '' : 's'}`);
+
+    // A DNI is the one thing the checkout says unlocks Precio Socio — so once one's typed in
+    // (valid format), this order is actually charged at that price, not just shown it as a
+    // hypothetical. Same Wednesday-extra rule Club CASE already advertises applies here too.
+    const dniValue = document.getElementById('ckDni')?.value || '';
+    const isSocio = isValidDni(dniValue);
+    const unitPrice = p => isSocio ? socioPrice(p.price) : p.price;
+
+    wrap.innerHTML = ids.length ? ids.map(id => {
+      const p = PRODUCTS.find(x => x.id === id);
+      const thumb = CART_THUMBS[id] || p.img;
+      const price = unitPrice(p);
+      return `
+        <div class="cart-item">
+          <div class="item-meta">
+            <div class="thumb"><img src="${IMG_BASE}${thumb}" alt="${p.name}"></div>
+            <div><div class="name">${p.name}</div><div class="unit">Precio unitario: ${money(price)}${isSocio ? ' (Socio)' : ''}</div></div>
+          </div>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" data-qty="${id}" data-delta="-1">−</button>
+            <span class="qty-val">${cart[id]}</span>
+            <button type="button" class="qty-btn" data-qty="${id}" data-delta="1">+</button>
+          </div>
+          <div class="item-total">
+            ${money(price * cart[id])}
+            <button type="button" class="trash-btn" data-remove="${id}" aria-label="Quitar ${p.name}"><svg class="ic" viewBox="0 0 24 24"><use href="#i-trash"/></svg></button>
+          </div>
+        </div>
+      `;
+    }).join('') : '<div class="cart-empty">Tu carrito está vacío. Agregá productos desde el catálogo.</div>';
+
+    wrap.querySelectorAll('[data-qty]').forEach(btn => btn.addEventListener('click', () => changeQty(btn.dataset.qty, Number(btn.dataset.delta))));
+    wrap.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', () => removeFromCart(btn.dataset.remove)));
+
+    const generalSubtotal = ids.reduce((sum, id) => sum + PRODUCTS.find(x => x.id === id).price * cart[id], 0);
+    const socioSubtotal = ids.reduce((sum, id) => sum + socioPrice(PRODUCTS.find(x => x.id === id).price) * cart[id], 0);
+    const socioFinal = isWednesday() ? Math.round(socioSubtotal * 0.95) : socioSubtotal;
+    const subtotal = isSocio ? socioFinal : generalSubtotal;
+    const isPickup = document.querySelector('#fulfillTabs .pay-tab.active')?.dataset.fulfill === 'pickup';
+    const shipping = subtotal > 0 && !isPickup ? SHIPPING : 0;
+    document.getElementById('sumSubtotal').textContent = money(subtotal);
+    document.getElementById('sumShippingLabel').textContent = isPickup ? 'Retiro en el local' : 'Envío express';
+    document.getElementById('sumShipping').textContent = isPickup ? 'Gratis' : money(shipping);
+    document.getElementById('sumTotal').textContent = money(subtotal + shipping);
+    document.getElementById('confirmBtn').disabled = generalSubtotal === 0;
+    document.getElementById('miniSummaryCount').textContent = `${count} producto${count === 1 ? '' : 's'}`;
+    document.getElementById('miniSummaryTotal').textContent = money(subtotal + shipping);
+
+    const nudge = document.getElementById('clubNudge');
+    nudge.hidden = generalSubtotal === 0;
+    if (!nudge.hidden) {
+      nudge.innerHTML = isSocio
+        ? `<span class="head"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg>Precio Socio aplicado</span>
+           <p>Ahorraste <strong>${money(generalSubtotal - socioFinal)}</strong> en este pedido.</p>`
+        : `<span class="head"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg>Precio Socio</span>
+           <span class="amt">${money(socioFinal + shipping)}</span>
+           <p>Con Club CASE este pedido te sale <strong>${money(generalSubtotal - socioFinal)}</strong> menos. <a href="sitio-case.html#club">Sumate gratis</a>.</p>`;
+    }
+  }
+
+  document.getElementById('catFilters').addEventListener('click', e => {
+    const btn = e.target.closest('.cat-tab');
+    if (!btn) return;
+    document.querySelectorAll('#catFilters .cat-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts(btn.dataset.cat);
+  });
+
+  // The category bar is the navbar: once it's actually pinned to the top (its sentinel has
+  // scrolled past), shrink it down to real navbar height and give it a shadow.
+  {
+    const catBar = document.getElementById('catBar');
+    const sentinel = document.getElementById('catBarSentinel');
+    new IntersectionObserver(
+      ([entry]) => catBar.classList.toggle('is-stuck', !entry.isIntersecting),
+      { threshold: 0 }
+    ).observe(sentinel);
+  }
+
+  document.getElementById('payTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.pay-tab');
+    if (!btn) return;
+    document.querySelectorAll('#payTabs .pay-tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+    const pay = btn.dataset.pay;
+    const needsCard = pay === 'credito' || pay === 'debito';
+    document.getElementById('cardFields').hidden = !needsCard;
+    document.getElementById('cardNote').hidden = !needsCard;
+    document.getElementById('cashNote').hidden = pay !== 'efectivo';
+    document.getElementById('mpNote').hidden = pay !== 'mercadopago';
+    document.getElementById('ckCardNum').required = needsCard;
+  });
+
+  document.getElementById('fulfillTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.pay-tab');
+    if (!btn) return;
+    document.querySelectorAll('#fulfillTabs .pay-tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+    const isPickup = btn.dataset.fulfill === 'pickup';
+    document.getElementById('direccionField').hidden = isPickup;
+    document.getElementById('ckDireccion').required = !isPickup;
+    document.getElementById('pickupNote').hidden = !isPickup;
+    if (isPickup) clearFieldError(document.getElementById('ckDireccion'));
+    renderCart();
+  });
+
+  // The total needs to react as the DNI is typed, not only on submit — that's the only way
+  // "entering a DNI unlocks Precio Socio" is actually true rather than a label next to a field
+  // that does nothing.
+  document.getElementById('ckDni').addEventListener('input', () => renderCart());
+
+  // Replaces native browser validation bubbles (inconsistent with this input design) with
+  // inline, Spanish, field-specific messages — and catches formats the native check misses,
+  // like a vencimiento typed as "8/29" instead of "08/29".
+  function setFieldError(input, message){
+    const field = input.closest('.field');
+    field.classList.add('has-error');
+    input.setAttribute('aria-invalid', 'true');
+    let msg = field.querySelector('.field-error-msg');
+    if (!msg) {
+      msg = document.createElement('span');
+      msg.className = 'field-error-msg';
+      msg.setAttribute('role', 'alert');
+      msg.id = input.id + 'Error';
+      field.appendChild(msg);
+      input.setAttribute('aria-describedby', msg.id);
+    }
+    msg.textContent = message;
+  }
+  function clearFieldError(input){
+    const field = input.closest('.field');
+    field.classList.remove('has-error');
+    input.removeAttribute('aria-invalid');
+    input.removeAttribute('aria-describedby');
+    const msg = field.querySelector('.field-error-msg');
+    if (msg) msg.remove();
+  }
+
+  function validateCheckout(){
+    const nombre = document.getElementById('ckNombre');
+    const direccion = document.getElementById('ckDireccion');
+    const dni = document.getElementById('ckDni');
+    const cardNum = document.getElementById('ckCardNum');
+    const venc = document.getElementById('ckVenc');
+    const cvv = document.getElementById('ckCvv');
+    const pay = document.querySelector('#payTabs .pay-tab.active')?.dataset.pay;
+    const needsCard = pay === 'credito' || pay === 'debito';
+    const isPickup = document.querySelector('#fulfillTabs .pay-tab.active')?.dataset.fulfill === 'pickup';
+
+    [nombre, direccion, dni, cardNum, venc, cvv].forEach(clearFieldError);
+
+    let firstInvalid = null;
+    const fail = (input, message) => { setFieldError(input, message); if (!firstInvalid) firstInvalid = input; };
+
+    if (!nombre.value.trim()) fail(nombre, 'Ingresá tu nombre completo.');
+    if (!isPickup && !direccion.value.trim()) fail(direccion, 'Ingresá la dirección de entrega.');
+    if (dni.value.trim() && !isValidDni(dni.value)) fail(dni, 'El DNI tiene 7 u 8 dígitos, sin puntos.');
+
+    if (needsCard) {
+      if (!/^[0-9]{13,19}$/.test(cardNum.value.replace(/\s+/g, ''))) fail(cardNum, 'Ingresá un número de tarjeta válido.');
+      if (!/^(0[1-9]|1[0-2])\/[0-9]{2}$/.test(venc.value.trim())) fail(venc, 'Usá el formato MM/AA.');
+      if (!/^[0-9]{3,4}$/.test(cvv.value.trim())) fail(cvv, 'El CVV tiene 3 o 4 dígitos.');
+    }
+
+    if (firstInvalid) { firstInvalid.focus(); return false; }
+    return true;
+  }
+
+  // The success screen said less than the cart summary said thirty seconds earlier — this
+  // snapshots what's about to be cleared so the confirmation can recap it instead of just
+  // a checkmark and a code.
+  function buildOrderRecap(){
+    const ids = Object.keys(cart);
+    const isPickup = document.querySelector('#fulfillTabs .pay-tab.active')?.dataset.fulfill === 'pickup';
+    const payLabel = document.querySelector('#payTabs .pay-tab.active')?.textContent.trim() || '';
+    const isSocio = isValidDni(document.getElementById('ckDni')?.value || '');
+    const unitPrice = p => isSocio ? socioPrice(p.price) : p.price;
+    const socioSubtotal = ids.reduce((sum, id) => sum + socioPrice(PRODUCTS.find(x => x.id === id).price) * cart[id], 0);
+    const generalSubtotal = ids.reduce((sum, id) => sum + PRODUCTS.find(x => x.id === id).price * cart[id], 0);
+    const subtotal = isSocio ? (isWednesday() ? Math.round(socioSubtotal * 0.95) : socioSubtotal) : generalSubtotal;
+    const shipping = isPickup ? 0 : SHIPPING;
+    const itemsHTML = ids.map(id => {
+      const p = PRODUCTS.find(x => x.id === id);
+      return `<div class="sum-row"><span class="lbl">${p.name} ×${cart[id]}</span><span class="val">${money(unitPrice(p) * cart[id])}</span></div>`;
+    }).join('');
+    const fulfillLabel = isPickup ? 'Retiro en el local' : 'Envío a domicilio';
+    return `
+      <div class="sum-rows">${itemsHTML}</div>
+      <div class="sum-divider"></div>
+      <div class="sum-row"><span class="lbl">${fulfillLabel}</span><span class="val">${isPickup ? 'Gratis' : money(shipping)}</span></div>
+      <div class="sum-row"><span class="lbl">Pagás con</span><span class="val">${payLabel}</span></div>
+      <div class="sum-divider"></div>
+      <div class="sum-total"><span class="lbl">Total pagado</span><span class="amt">${money(subtotal + shipping)}</span></div>
+    `;
+  }
+
+  document.getElementById('checkoutForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if (Object.keys(cart).length === 0) return;
+    if (!validateCheckout()) return;
+
+    // Disabling the button synchronously blocks a rapid double-click from firing a second
+    // submit before this one finishes, and gives the one moment in the flow that most needs
+    // it (payment) a visible processing state instead of an instant jump to "confirmed".
+    const btn = document.getElementById('confirmBtn');
+    btn.disabled = true;
+    btn.textContent = 'Procesando...';
+
+    setTimeout(() => {
+      document.getElementById('checkoutGrid').hidden = true;
+      const panel = document.getElementById('successPanel');
+      document.getElementById('orderCode').textContent = 'CASE-' + Math.floor(10000 + Math.random() * 89999);
+      document.getElementById('orderRecap').innerHTML = buildOrderRecap();
+      panel.hidden = false;
+      panel.scrollIntoView({ behavior:'smooth', block:'center' });
+      btn.textContent = 'Confirmar pedido';
+      // The order is placed — an empty, re-rendered cart is what keeps a visitor who scrolls
+      // back up from seeing the same purchasable cart sitting above a "confirmed" order.
+      clearCart();
+    }, 600);
+  });
+
+  if (isWednesday()) {
+    const banner = document.getElementById('wedBanner');
+    banner.classList.add('is-today');
+    document.getElementById('wedBannerText').textContent = 'Hoy es miércoles: 5% OFF extra para socios con el código';
+  }
+
+  renderProducts('all');
+  renderCart();
+</script>
+
+</body>
+</html>

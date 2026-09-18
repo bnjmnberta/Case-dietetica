@@ -1,0 +1,13 @@
+# Exported by three-d-stage
+newmtl verde_lima
+Kd 0.3278 0.5841 0.0685
+Ks 0.2000 0.2000 0.2000
+Ns 156
+d 1.0000
+
+newmtl verde_canto
+Kd 0.1590 0.3712 0.0369
+Ks 0.2000 0.2000 0.2000
+Ns 152
+d 1.0000
+
