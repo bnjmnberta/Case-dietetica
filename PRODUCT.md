@@ -1,4 +1,12 @@
+---
+type: referencia
+tags: [tars/clientes, caso-portfolio, sub/portfolio]
+aliases: [PRODUCT CASE]
+---
+
 # CASE — Dietética & Comida Real (Santa Fe, Argentina)
+
+Caso de portfolio de [[TARS]]. Resumen en [[CASE Dietetica]]. Mapa: [[MOC Clientes y Producto]].
 
 > Nota: no hubo entrevista interactiva de producto. Este PRODUCT.md se infirió del sitio incumbente (`sitio-case.html`), del mockup de Instagram (`instagram-case.html`) y del documento de plan (`plan-case.html`), todos consistentes entre sí. Sustitución declarada por pedido explícito de redisño + urgencia del usuario.
 
